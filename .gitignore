@@ -1,0 +1,39 @@
+# ---- Secretos: NUNCA versionar ----
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ---- Datos locales ----
+data/
+*.db
+*.sqlite3
+*.csv
+*.parquet
+!docs/ejemplos/*.csv
+
+# ---- Docker / volúmenes ----
+volumes/
+
+# ---- Editores ----
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+
+# ---- Sistema ----
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,24 @@
+# Normalización automática: LF en el repositorio
+* text=auto eol=lf
+
+# Archivos que SIEMPRE deben ser LF
+*.sh      text eol=lf
+*.py      text eol=lf
+*.sql     text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+*.toml    text eol=lf
+*.env*    text eol=lf
+Dockerfile text eol=lf
+
+# Archivos que SIEMPRE deben ser CRLF (si alguna vez hay scripts de Windows)
+*.bat     text eol=crlf
+*.ps1     text eol=crlf
+
+# Binarios: no tocar
+*.png     binary
+*.jpg     binary
+*.pdf     binary
+*.xlsx    binary

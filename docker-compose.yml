@@ -14,6 +14,15 @@ services:
       GF_LOG_LEVEL: info
       GF_ANALYTICS_REPORTING_ENABLED: "false"
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      # Consumidas por grafana/provisioning/datasources/mssql.yaml para
+      # interpolar la conexión directa a SQL Server (ver docs/ARQUITECTURA.md).
+      MSSQL_HOST: ${MSSQL_HOST}
+      MSSQL_PORT: ${MSSQL_PORT}
+      MSSQL_DB: ${MSSQL_DB}
+      MSSQL_USER_GRAFANA: ${MSSQL_USER_GRAFANA}
+      MSSQL_PASS_GRAFANA: ${MSSQL_PASS_GRAFANA}
+      MSSQL_ENCRYPT: ${MSSQL_ENCRYPT}
+      MSSQL_TRUST_CERT: ${MSSQL_TRUST_CERT}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro

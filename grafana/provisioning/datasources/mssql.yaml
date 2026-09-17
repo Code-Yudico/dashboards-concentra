@@ -1,0 +1,20 @@
+apiVersion: 1
+
+# Datasource nativo de Grafana (tipo "mssql", incluido en grafana-oss, sin
+# plugin ni driver adicional). Conecta directo a SQL Server: no hay capa
+# analítica intermedia en esta iteración del proyecto — ver docs/ARQUITECTURA.md
+# para el porqué y el criterio de cuándo revisar esta decisión.
+datasources:
+  - name: SQL Server Concentra
+    type: mssql
+    access: proxy
+    url: ${MSSQL_HOST},${MSSQL_PORT}
+    database: ${MSSQL_DB}
+    user: ${MSSQL_USER_GRAFANA}
+    secureJsonData:
+      password: ${MSSQL_PASS_GRAFANA}
+    jsonData:
+      encrypt: "true"
+      tlsSkipVerify: true
+    isDefault: true
+    editable: false

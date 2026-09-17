@@ -1,14 +1,17 @@
 # Dashboards Concentra
 
-Sistema de tableros de BI sobre Grafana, alimentado desde SQL Server y MariaDB.
+Sistema de tableros de BI sobre Grafana, alimentado directamente desde SQL Server.
 
 ## Arquitectura
 
-- **Origen**: SQL Server y MariaDB (acceso de solo lectura)
-- **Ingesta**: procesos Python containerizados
-- **Almacén analítico**: PostgreSQL
-- **Visualización**: Grafana, con provisioning versionado
+- **Origen**: SQL Server (acceso de solo lectura, vistas con KPIs ya agregados)
+- **Visualización**: Grafana, consultando SQL Server directo vía su datasource nativo `mssql`,
+  con provisioning versionado (datasources, dashboards)
 - **Despliegue**: Coolify sobre Linux, desde este repositorio
+
+MariaDB fue una hipótesis inicial de origen, descartada — el origen confirmado es únicamente
+SQL Server (ver `docs/ARQUITECTURA.md`). No hay capa analítica intermedia ni ETL en esta
+iteración del proyecto: el volumen y la concurrencia esperados no lo justifican todavía.
 
 ## Requisitos
 

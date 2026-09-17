@@ -5,6 +5,8 @@
 *.pem
 *.key
 secrets/
+api_token-coolify
+*api_token*
 
 # ---- Python ----
 __pycache__/

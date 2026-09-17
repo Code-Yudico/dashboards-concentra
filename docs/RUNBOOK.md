@@ -83,8 +83,35 @@ distro y clonar el repo.
 ## Despliegue en Coolify
 
 - Coolify despliega el mismo `docker-compose.yml` de este repositorio; las variables de entorno
-  de producción se configuran en la UI de Coolify, replicando `.env.example`.
+  de producción se configuran en la UI de Coolify (pestaña **Environment Variables** del
+  recurso), replicando `.env.example`.
 - **Antes de dar por cerrado el despliegue**, validar que el servidor de Coolify tiene ruta de
   red hacia SQL Server (`$MSSQL_HOST:$MSSQL_PORT`) — es un supuesto externo, coordinado en
   paralelo con el equipo de infraestructura (ver `docs/ARQUITECTURA.md`).
 - Confirmar que el volumen nombrado `dc_grafana_data` no se destruye en cada redeploy.
+
+### Gotcha: bind mounts de config quedan vacíos ("Preserve Repository During Deployment")
+
+Por defecto, Coolify limpia el checkout del repositorio después de clonarlo, dejando **vacíos**
+los bind mounts relativos definidos en el compose (en nuestro caso,
+`./grafana/provisioning:...` y `./grafana/dashboards:...`). El síntoma es que el contenedor
+levanta sano, pero Grafana no tiene ningún datasource ni dashboard cargado.
+
+**Fix:** en la configuración de la aplicación en Coolify (Configuration → Advanced, o vía API
+como campo `settings.is_preserve_repository_enabled`), activar **"Preserve Repository During
+Deployment"**, y volver a desplegar. Esto aplica también al servidor remoto definitivo — no es
+algo exclusivo de esta instancia provisional.
+
+Verificación tras cada deploy nuevo:
+```bash
+docker exec <contenedor-grafana> find /etc/grafana/provisioning -maxdepth 3
+# debe listar datasources/mssql.yaml y dashboards/default.yaml, no solo las carpetas vacías
+```
+
+### Coolify local (provisional) — acceso y notas
+
+- Dashboard de Coolify: `http://localhost:8000` (en este equipo, mientras dure la instancia
+  provisional — ver `docs/ARQUITECTURA.md`).
+- Un token de API con permisos de escritura sobre esta instancia es equivalente a tener acceso
+  de administrador — no lo dejes en archivos versionados ni sin usar por más tiempo del
+  necesario. Revócalo desde **Keys & Tokens → API tokens** cuando ya no lo necesites.

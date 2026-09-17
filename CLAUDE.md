@@ -16,6 +16,9 @@ WSL2 con Docker Compose y desplegado en producción vía Coolify sobre un servid
   solo en variables de entorno.
 - **WSL2 es una unidad de contención desechable.** Todo vive dentro de la distro "dashboards";
   `wsl --unregister dashboards` elimina el sistema completo sin afectar el repositorio remoto.
+  **Excepción temporal:** mientras Coolify corra provisionalmente en esta misma distro (ver
+  abajo), desregistrarla también destruiría esa instancia de Coolify — no solo el entorno de
+  desarrollo.
 - **Grafana como código.** Todo por provisioning versionado (`grafana/provisioning/`); nada se
   configura solo por UI sin reflejarse en el repo.
 
@@ -73,8 +76,11 @@ detallado paso a paso. Resumen:
   `SELECT` acotado a las vistas de KPIs, y confirmar/crear esas vistas. Sin esto, el datasource
   no puede probarse con datos reales.
 - [ ] Primer dashboard versionado (`grafana/dashboards/`) una vez el datasource esté validado.
-- [ ] Despliegue en Coolify — pendiente de confirmar ruta de red desde el servidor de Coolify
-  hacia SQL Server (supuesto externo, coordinado con infraestructura).
+- [ ] Despliegue en Coolify — **decisión temporal:** se instala Coolify provisionalmente en este
+  mismo equipo (WSL2 "dashboards") para tener un MVP de demo, mientras se asigna un servidor Linux
+  remoto dedicado. Ver riesgos aceptados y plan de migración en `docs/ARQUITECTURA.md`
+  ("Coolify provisional en el equipo de desarrollo"). Cuando se asigne el servidor remoto, se
+  reinstala Coolify ahí y se reconecta el mismo repositorio — sin cambios de código.
 
 ## Notas operativas
 

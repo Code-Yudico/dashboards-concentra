@@ -23,6 +23,14 @@ services:
       MSSQL_PASS_GRAFANA: ${MSSQL_PASS_GRAFANA}
       MSSQL_ENCRYPT: ${MSSQL_ENCRYPT}
       MSSQL_TRUST_CERT: ${MSSQL_TRUST_CERT}
+      # Consumidas por grafana/provisioning/datasources/mssql-intelix.yaml
+      # (segundo origen SQL Server, servidor DEV, vista vw_dashboard_usuarios_intelix).
+      MSSQL_INTELIX_HOST: ${MSSQL_INTELIX_HOST}
+      MSSQL_INTELIX_DB: ${MSSQL_INTELIX_DB}
+      MSSQL_INTELIX_USER: ${MSSQL_INTELIX_USER}
+      MSSQL_INTELIX_PASS: ${MSSQL_INTELIX_PASS}
+      MSSQL_INTELIX_ENCRYPT: ${MSSQL_INTELIX_ENCRYPT}
+      MSSQL_INTELIX_TRUST_CERT: ${MSSQL_INTELIX_TRUST_CERT}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro

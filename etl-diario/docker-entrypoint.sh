@@ -9,23 +9,24 @@ set -eu
 
 CRON_FILE=/etc/cron.d/snapshot-cron
 SCHEDULE="${SNAPSHOT_CRON_SCHEDULE:-0 6 * * *}"
-OUTPUT_PATH="${SNAPSHOT_OUTPUT_PATH:-/data/snapshot.json}"
+OUTPUT_PATH="${SNAPSHOT_OUTPUT_PATH:-/data/datos.js}"
 
 {
-    echo "MSSQL_INTELIX_HOST=${MSSQL_INTELIX_HOST}"
-    echo "MSSQL_INTELIX_PORT=${MSSQL_INTELIX_PORT}"
-    echo "MSSQL_INTELIX_DB=${MSSQL_INTELIX_DB}"
-    echo "MSSQL_INTELIX_USER=${MSSQL_INTELIX_USER}"
-    echo "MSSQL_INTELIX_PASS=${MSSQL_INTELIX_PASS}"
+    echo "MSSQL_INTELIX_1_HOST=${MSSQL_INTELIX_1_HOST}"
+    echo "MSSQL_INTELIX_1_DB=${MSSQL_INTELIX_1_DB}"
+    echo "MSSQL_INTELIX_1_USER=${MSSQL_INTELIX_1_USER}"
+    echo "MSSQL_INTELIX_1_PASS=${MSSQL_INTELIX_1_PASS}"
+    echo "MSSQL_INTELIX_1_ENCRYPT=${MSSQL_INTELIX_1_ENCRYPT}"
+    echo "MSSQL_INTELIX_1_TRUST_CERT=${MSSQL_INTELIX_1_TRUST_CERT}"
     echo "SNAPSHOT_OUTPUT_PATH=${OUTPUT_PATH}"
-    echo "${SCHEDULE} root cd /app && python3 extraer_snapshot.py >> /var/log/snapshot-cron.log 2>&1"
+    echo "${SCHEDULE} root cd /app && python3 exportar.py >> /var/log/snapshot-cron.log 2>&1"
 } > "$CRON_FILE"
 chmod 0644 "$CRON_FILE"
 
 touch /var/log/snapshot-cron.log
 
 echo "Extraccion inicial al arrancar el contenedor..."
-python3 extraer_snapshot.py >> /var/log/snapshot-cron.log 2>&1 || echo "Extraccion inicial fallo, revisa /var/log/snapshot-cron.log" >&2
+python3 exportar.py >> /var/log/snapshot-cron.log 2>&1 || echo "Extraccion inicial fallo, revisa /var/log/snapshot-cron.log" >&2
 
 cron
 tail -F /var/log/snapshot-cron.log

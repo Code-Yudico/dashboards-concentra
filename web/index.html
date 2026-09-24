@@ -1,60 +1,1008 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Licencias Intelix</title>
-<link rel="stylesheet" href="style.css" />
-<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2/plotly.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f3f1ec; --bg-deep:#e8e4db;
+  --surface:#fcfcfb; --surface-2:#f6f5f1; --line:#e3e0d8; --grid:#ebe8e1;
+  --ink:#16150f; --ink-2:#52514e; --ink-3:#8a8880;
+  --bar:#2a78d6; --bar-soft:#86b6ef; --bar-hot:#104281;
+  --max:#16150f; --accent:#eb6834;
+  --chip:#fff; --chip-on:#16150f; --chip-on-ink:#fcfcfb;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --shadow:0 1px 0 rgba(22,21,15,.04), 0 12px 32px -18px rgba(22,21,15,.25);
+  --pop-shadow:0 18px 50px -12px rgba(22,21,15,.35);
+  --font:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#121210; --bg-deep:#0b0b0a;
+    --surface:#1a1a19; --surface-2:#211f1d; --line:#2e2d2a; --grid:#262523;
+    --ink:#f6f5f1; --ink-2:#c3c2b7; --ink-3:#8a8880;
+    --bar:#3987e5; --bar-soft:#1c5cab; --bar-hot:#9ec5f4;
+    --max:#f6f5f1; --accent:#d95926;
+    --chip:#1f1e1c; --chip-on:#f6f5f1; --chip-on-ink:#121210;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 16px 40px -20px rgba(0,0,0,.8);
+    --pop-shadow:0 18px 50px -12px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#121210; --bg-deep:#0b0b0a;
+  --surface:#1a1a19; --surface-2:#211f1d; --line:#2e2d2a; --grid:#262523;
+  --ink:#f6f5f1; --ink-2:#c3c2b7; --ink-3:#8a8880;
+  --bar:#3987e5; --bar-soft:#1c5cab; --bar-hot:#9ec5f4;
+  --max:#f6f5f1; --accent:#d95926;
+  --chip:#1f1e1c; --chip-on:#f6f5f1; --chip-on-ink:#121210;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 16px 40px -20px rgba(0,0,0,.8);
+  --pop-shadow:0 18px 50px -12px rgba(0,0,0,.9);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font:14px/1.45 var(--font); color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--bar) 14%, transparent), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg-deep));
+  background-attachment: fixed;
+  min-height:100vh;
+}
+.wrap{max-width:1360px; margin:0 auto; padding:20px clamp(16px,3vw,40px) 64px}
+.num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+button{font:inherit; color:inherit; cursor:pointer}
+button:disabled{cursor:not-allowed}
+
+/* ---------- cabecera ---------- */
+header.top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:14px}
+.eyebrow{font:500 11px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); display:flex; align-items:center; gap:8px}
+.pulse{width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+h1{font-weight:800; font-size:clamp(26px,3.2vw,38px); letter-spacing:-.03em; line-height:1; margin:8px 0 0}
+h1 em{font-style:normal; color:var(--bar)}
+.meta{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.stamp{font:12px/1.3 var(--mono); color:var(--ink-3); text-align:right}
+.btn{border:1px solid var(--line); background:var(--surface); border-radius:10px; height:34px; padding:0 12px; display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600; transition:transform .15s, border-color .15s; white-space:nowrap}
+.btn:hover:not(:disabled){transform:translateY(-1px); border-color:var(--ink-3)}
+.btn.primary{background:var(--chip-on); color:var(--chip-on-ink); border-color:var(--chip-on)}
+.btn.round{border-radius:999px}
+
+/* ---------- barra de herramientas ---------- */
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow)}
+.toolbar{position:sticky; top:8px; z-index:30; padding:10px 12px; margin-bottom:14px;
+  background:color-mix(in srgb,var(--surface) 88%,transparent); backdrop-filter:blur(10px)}
+.trow{display:flex; flex-wrap:wrap; gap:10px 12px; align-items:center}
+.sep{width:1px; align-self:stretch; background:var(--line); margin:2px 2px}
+.seg{display:inline-flex; background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:2px}
+.seg button{border:0; background:transparent; padding:5px 12px; border-radius:8px; font-weight:600; font-size:13px; color:var(--ink-2)}
+.seg button[aria-pressed="true"]{color:var(--chip-on-ink); background:var(--chip-on)}
+.range{display:inline-flex; align-items:center; gap:5px; flex-wrap:wrap}
+.range input{font:12.5px var(--mono); height:34px; padding:0 8px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); color:var(--ink)}
+.preset{border:1px dashed var(--line); background:transparent; border-radius:8px; padding:4px 8px; font-size:12px; color:var(--ink-2)}
+.preset:hover{border-style:solid; color:var(--ink)}
+.spacer{flex:1}
+
+/* filtro desplegable: botón + borrar pegados */
+.dd{position:relative; display:inline-flex}
+.dd-btn{border:1px solid var(--line); background:var(--surface); height:34px; padding:0 10px 0 12px; border-radius:10px 0 0 10px; display:inline-flex; gap:6px; align-items:center; font-size:13px; max-width:230px}
+.dd-btn .lbl{color:var(--ink-3); font-weight:400}
+.dd-btn .val{font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.dd-btn .car{color:var(--ink-3); font-size:10px; transition:transform .15s}
+.dd.open .dd-btn .car{transform:rotate(180deg)}
+.dd.on .dd-btn{border-color:var(--chip-on); background:var(--chip-on); color:var(--chip-on-ink)}
+.dd.on .dd-btn .lbl,.dd.on .dd-btn .car{color:color-mix(in srgb,var(--chip-on-ink) 65%,transparent)}
+.dd-clr{border:1px solid var(--line); border-left:0; background:var(--surface-2); height:34px; width:32px; border-radius:0 10px 10px 0; font-size:15px; line-height:1; color:var(--ink-2)}
+.dd.on .dd-clr{border-color:var(--chip-on); color:var(--accent)}
+.dd-clr:disabled{opacity:.4}
+.dd-clr:not(:disabled):hover{color:var(--accent)}
+.pop{position:absolute; top:calc(100% + 6px); left:0; width:340px; max-width:calc(100vw - 32px); background:var(--surface); border:1px solid var(--line); border-radius:14px; box-shadow:var(--pop-shadow); z-index:40; padding:10px; animation:pop .14s ease both}
+@keyframes pop{from{opacity:0; transform:translateY(-4px)}to{opacity:1; transform:none}}
+.pop input[type=search]{width:100%; font:13px var(--font); padding:7px 10px; border:1px solid var(--line); border-radius:9px; background:var(--surface-2); color:var(--ink); margin-bottom:6px}
+.opts{max-height:300px; overflow:auto; margin:0 -4px; padding:0 4px}
+.opt{display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:8px; cursor:pointer; user-select:none}
+.opt:hover{background:var(--surface-2)}
+.opt input{accent-color:var(--bar); width:15px; height:15px; margin:0}
+.opt .t{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.opt .n{font:11.5px var(--mono); color:var(--ink-3)}
+.opt.zero{opacity:.4}
+.pop-foot{display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); margin-top:6px; padding-top:8px; gap:8px}
+.pop-foot small{color:var(--ink-3); font:11px var(--mono)}
+.link{border:0; background:none; padding:0; color:var(--bar); font-size:12.5px; text-decoration:underline; text-underline-offset:3px}
+.link:disabled{color:var(--ink-3); text-decoration:none}
+
+.actives{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:8px; padding-top:8px; border-top:1px dashed var(--line)}
+.actives[hidden]{display:none}
+.actives .k{font:500 10.5px var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-right:2px}
+.pill{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); background:var(--surface-2); border-radius:999px; padding:2px 4px 2px 10px; font-size:12.5px}
+.pill small{color:var(--ink-3)}
+.pill button{border:0; background:transparent; width:20px; height:20px; border-radius:50%; line-height:18px; padding:0; color:var(--ink-3)}
+.pill button:hover{background:var(--line); color:var(--accent)}
+
+/* ---------- KPIs ---------- */
+.kpis{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:14px}
+.kpi{padding:14px 18px 12px; position:relative; overflow:hidden}
+.kpi .k{font:500 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3)}
+.kpi .v{font:500 clamp(24px,2.5vw,32px)/1.1 var(--mono); letter-spacing:-.02em; margin:9px 0 3px; font-variant-numeric:tabular-nums}
+.kpi .d{color:var(--ink-2); font-size:12.5px}
+.kpi.hero{background:var(--chip-on); color:var(--chip-on-ink); border-color:transparent}
+.kpi.hero .k,.kpi.hero .d{color:color-mix(in srgb,var(--chip-on-ink) 72%,transparent)}
+.delta{font:12px var(--mono); padding:1px 6px; border-radius:6px; background:var(--surface-2)}
+.delta.up::before{content:"▲ "} .delta.down::before{content:"▼ "}
+
+/* ---------- gráfico ---------- */
+.chart-panel{padding:16px 18px 8px; margin-bottom:14px}
+.chart-head{display:flex; flex-wrap:wrap; gap:8px 20px; align-items:baseline; justify-content:space-between}
+.chart-head h2{margin:0; font-size:19px; letter-spacing:-.02em}
+.hint{color:var(--ink-3); font-size:12.5px}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--ink-2)}
+.legend span{display:inline-flex; gap:6px; align-items:center}
+.sw{width:12px; height:12px; border-radius:3px; display:inline-block}
+.sw.line{height:0; border-top:2px dashed var(--max); border-radius:0; width:18px}
+.sw.part{background:repeating-linear-gradient(135deg,var(--bar) 0 2px,transparent 2px 5px); border:1px solid var(--bar)}
+#chart{position:relative; height:400px; margin-top:4px}
+@media (max-height:820px){ #chart{height:320px} }
+#chart svg{display:block; overflow:visible}
+.axis text{font:11px var(--mono); fill:var(--ink-3)}
+.gridline{stroke:var(--grid); stroke-width:1}
+.baseline{stroke:var(--ink-3); stroke-width:1}
+.bar{transition:opacity .2s}
+.maxline{stroke:var(--max); stroke-width:1.5; stroke-dasharray:6 5}
+.maxtag rect{fill:var(--max)}
+.maxtag text{font:500 11.5px var(--mono); fill:var(--surface)}
+.vlabel{font:500 11px var(--mono); fill:var(--ink)}
+.hit{fill:transparent; cursor:pointer}
+.sel-pill{display:inline-flex; gap:8px; align-items:center; background:var(--accent); color:#fff; border-radius:999px; padding:3px 6px 3px 12px; font-size:12.5px}
+.sel-pill button{border:0; background:rgba(255,255,255,.22); color:#fff; border-radius:999px; width:20px; height:20px; line-height:18px; padding:0}
+.tip{position:fixed; pointer-events:none; z-index:50; background:var(--surface); color:var(--ink); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:10px 12px; min-width:190px; font-size:12.5px; opacity:0; transform:translateY(4px); transition:opacity .12s, transform .12s}
+.tip.on{opacity:1; transform:none}
+.tip .t{font-weight:600; margin-bottom:6px}
+.tip .row{display:flex; justify-content:space-between; gap:16px; color:var(--ink-2)}
+.tip .row b{color:var(--ink); font:500 12.5px var(--mono)}
+.meter{height:4px; background:var(--grid); border-radius:4px; margin-top:8px; overflow:hidden}
+.meter i{display:block; height:100%; background:var(--bar)}
+
+/* ---------- top 15 (líneas) ---------- */
+.top-panel{padding:16px 18px 12px; margin-top:14px}
+.top-grid{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:18px; margin-top:8px; align-items:start}
+#top{position:relative; height:530px}
+#top svg{display:block; overflow:visible}
+#top .ln{fill:none; stroke-width:2; stroke-linejoin:round; stroke-linecap:round; transition:opacity .15s, stroke-width .15s}
+#top .ln.gray{stroke:var(--ink-3); stroke-width:1.25; opacity:.35}
+#top .ln.part{stroke-dasharray:4 4}
+#top .dot{stroke:var(--surface); stroke-width:2}
+#top .dot.hollow{fill:var(--surface)!important; stroke-width:1.75}
+#top .endlbl{font:500 11px var(--font); fill:var(--ink)}
+#top .hitln{fill:none; stroke:transparent; stroke-width:12; cursor:pointer}
+#top .xcross{stroke:var(--ink-3); stroke-width:1; stroke-dasharray:2 3}
+#top.focus .ln{opacity:.12} #top.focus .ln.on{opacity:1; stroke-width:3}
+#top.focus .dot{opacity:.12} #top.focus .dot.on{opacity:1}
+#top.focus .endlbl{opacity:.15} #top.focus .endlbl.on{opacity:1}
+.tlegend{display:flex; flex-direction:column; gap:1px; max-height:560px; overflow:auto}
+.tlegend .lh{display:flex; justify-content:space-between; align-items:center; font:500 10.5px var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); padding:0 8px 6px}
+.tl{display:grid; grid-template-columns:22px 14px minmax(0,1fr) auto; gap:8px; align-items:center; padding:3px 8px; border-radius:8px; cursor:pointer; user-select:none; border:1px solid transparent}
+.tl:hover,.tl.hl{background:var(--surface-2)}
+.tl.on{border-color:var(--line)}
+.tl .rk{font:11px var(--mono); color:var(--ink-3)}
+.tl .sw2{width:14px; height:4px; border-radius:2px; background:var(--ink-3); opacity:.35}
+.tl.on .sw2{opacity:1; height:6px}
+.tl .nm{overflow:hidden; line-height:1.2}
+.tl .nm b{display:block; font-weight:600; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tl .nm small{display:block; color:var(--ink-3); font-size:10.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.tl .mx{font:500 12.5px var(--mono); text-align:right}
+.tip .row i{display:inline-block; width:10px; height:3px; border-radius:2px; margin-right:6px; vertical-align:middle}
+.tip .row.dim{opacity:.55}
+@media (max-width:1000px){ .top-grid{grid-template-columns:1fr} .tlegend{max-height:none} }
+
+/* ---------- tabla ---------- */
+.table-panel{padding:16px 0 4px}
+.table-head{display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; justify-content:space-between; padding:0 18px 12px}
+.table-head h2{margin:0; font-size:19px; letter-spacing:-.02em}
+.table-head input{font:13px var(--font); height:34px; padding:0 11px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); color:var(--ink); width:260px; max-width:100%}
+.tscroll{overflow-x:auto}
+.tbox{max-height:620px; overflow:auto; border-top:1px solid var(--line)}
+.tbox thead th{position:sticky; top:0; z-index:2; box-shadow:0 1px 0 var(--line)}
+.tbox tfoot td{position:sticky; bottom:0; background:var(--surface); z-index:2}
+table{width:100%; border-collapse:collapse; min-width:980px}
+th,td{padding:9px 8px; text-align:left; border-top:1px solid var(--line); white-space:nowrap}
+th{font:500 10.5px/1 var(--mono); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); border-top:0; cursor:pointer; user-select:none; background:var(--surface)}
+th.r,td.r{text-align:right}
+td.wr{white-space:normal; min-width:120px; max-width:180px}
+th[aria-sort="ascending"]::after{content:" ↑"} th[aria-sort="descending"]::after{content:" ↓"}
+tbody tr{transition:background .12s}
+tbody tr:hover{background:var(--surface-2)}
+td .cname{font-weight:600}
+td .cid{font:11px var(--mono); color:var(--ink-3)}
+.tag{font-size:11.5px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--ink-2)}
+.tag.int{border-color:color-mix(in srgb,var(--bar) 50%,var(--line))}
+.tag.ext{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.inbar{display:flex; align-items:center; gap:10px; justify-content:flex-end}
+.inbar .nums{display:flex; flex-direction:column; align-items:flex-end; line-height:1.2}
+.inbar .nums small{font:10.5px var(--mono); color:var(--ink-3)}
+.inbar .track{width:80px; height:8px; background:var(--grid); border-radius:4px; overflow:hidden}
+.inbar .track i{display:block; height:100%; background:var(--bar); border-radius:4px}
+.spark{display:block}
+.spark path.a{fill:color-mix(in srgb,var(--bar) 16%,transparent)}
+.spark path.l{fill:none; stroke:var(--bar); stroke-width:1.5}
+.spark circle{fill:var(--accent)}
+tfoot td{font-weight:600; border-top:2px solid var(--line)}
+.foot-note{padding:10px 18px 12px; color:var(--ink-3); font-size:12px}
+.empty{padding:40px; text-align:center; color:var(--ink-3)}
+.toast{position:fixed; bottom:20px; left:50%; transform:translate(-50%,20px); background:var(--chip-on); color:var(--chip-on-ink); padding:10px 16px; border-radius:12px; font-size:13px; opacity:0; transition:.2s; z-index:60; pointer-events:none}
+.toast.on{opacity:1; transform:translate(-50%,0)}
+
+.fade-in{animation:fade .45s ease both}
+@keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+.kpis .panel:nth-child(2){animation-delay:.04s}.kpis .panel:nth-child(3){animation-delay:.08s}
+.kpis .panel:nth-child(4){animation-delay:.12s}.kpis .panel:nth-child(5){animation-delay:.16s}
+
+@media (max-width:1000px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} .kpi.hero{grid-column:1/-1} .sep{display:none} }
+@media (max-width:640px){ #chart{height:300px} .stamp{text-align:left} .toolbar{position:static} }
+@media (prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
+</style>
 </head>
 <body>
-<header>
-  <h1>Licencias de usuario &mdash; Intelix</h1>
-  <p class="subtitulo">Suma de <code>num_usuarios</code> a lo largo del tiempo, por criterio seleccionado.</p>
-</header>
+<script src="data/datos.js"></script>
 
-<main>
-  <section class="controles">
-    <label>
-      Agrupar por
-      <select id="agrupar_por">
-        <option value="ceco">Centro de costo</option>
-        <option value="DeptoBiometrico">Depto biométrico</option>
-        <option value="alias">Alias</option>
-        <option value="SITE" selected>Site</option>
-        <option value="locacion">Locación</option>
-      </select>
-    </label>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow"><span class="pulse"></span>Intelix Big Data</div>
+      <h1>Licencias <em>Intelix</em></h1>
+    </div>
+    <div class="meta">
+      <div class="stamp" id="stamp"></div>
+      <button class="btn round" id="resetAll" title="Quitar todos los filtros">↺ Limpiar filtros</button>
+      <button class="btn round primary" id="xlsx" title="Descargar a Excel lo que se está viendo">↓ Descargar Excel</button>
+      <button class="btn round" id="theme" title="Cambiar tema">◐ <span id="themeLbl">Tema</span></button>
+    </div>
+  </header>
 
-    <label>
-      Granularidad
-      <select id="granularidad">
-        <option value="dia">Día</option>
-        <option value="semana">Semana</option>
-        <option value="mes" selected>Mes</option>
-      </select>
-    </label>
-
-    <label>
-      Tipo de gráfico
-      <select id="tipo_grafico">
-        <option value="barras_apiladas" selected>Barras apiladas</option>
-        <option value="lineas">Líneas múltiples</option>
-        <option value="area_apilada">Área apilada</option>
-        <option value="barras_100">Barras 100% (proporción)</option>
-      </select>
-    </label>
+  <section class="panel toolbar" id="toolbar">
+    <div class="trow">
+      <span class="seg" id="gran">
+        <button data-v="dia" aria-pressed="true">Día</button>
+        <button data-v="semana" aria-pressed="false">Semana</button>
+        <button data-v="mes" aria-pressed="false">Mes</button>
+      </span>
+      <span class="range">
+        <input type="date" id="d0" title="Desde"><span style="color:var(--ink-3)">→</span><input type="date" id="d1" title="Hasta">
+        <button class="preset" data-p="30">30 d</button>
+        <button class="preset" data-p="90">90 d</button>
+        <button class="preset" data-p="mes">Mes</button>
+        <button class="preset" data-p="todo">Todo</button>
+      </span>
+      <span id="dds" class="trow"></span>
+    </div>
+    <div class="actives" id="actives" hidden></div>
   </section>
 
-  <section id="estado" class="estado" hidden></section>
+  <section class="kpis" id="kpis"></section>
 
-  <section class="grafico">
-    <div id="plot"></div>
+  <section class="panel chart-panel fade-in">
+    <div class="chart-head">
+      <div>
+        <h2 id="chartTitle">Usuarios conectados por día</h2>
+        <div class="hint">Cursor para ver el detalle · clic en una barra para enfocar la tabla en ese periodo</div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div id="chart"></div>
   </section>
 
-  <footer id="pie" class="pie"></footer>
-</main>
+  <section class="panel table-panel fade-in">
+    <div class="table-head">
+      <div>
+        <h2>Detalle por ceco</h2>
+        <div class="hint" id="tableHint"></div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+        <span id="selPill"></span>
+        <input id="q" type="search" placeholder="Buscar ceco, alias, site…">
+      </div>
+    </div>
+    <div class="tscroll tbox"><table id="tbl"></table></div>
+    <div class="foot-note">Máx. día es el día con más usuarios conectados de cada ceco dentro del periodo. En el total es el día pico del conjunto filtrado, no la suma de los máximos de cada ceco.</div>
+  </section>
 
-<script src="app.js"></script>
+  <section class="panel top-panel fade-in">
+    <div class="chart-head">
+      <div>
+        <h2>Top 15 cecos por licencias · máximo día por mes</h2>
+        <div class="hint" id="topHint"></div>
+      </div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--s1)"></i>Cecos resaltados</span>
+        <span><i class="sw" style="background:var(--ink-3); opacity:.35"></i>Resto del top 15</span>
+        <span><i class="sw line" style="border-top-style:dotted; border-color:var(--ink-2)"></i>Mes en curso (parcial)</span>
+        <span><i class="sw line"></i>Máximo de lo visible</span>
+      </div>
+    </div>
+    <div class="top-grid">
+      <div id="top"></div>
+      <div class="tlegend" id="topLegend"></div>
+    </div>
+  </section>
+</div>
+<div class="tip" id="tip"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+"use strict";
+const D = window.DASH_CONEX;
+if (!D) {
+  document.querySelector(".wrap").innerHTML =
+    '<div class="panel empty">No se encontró <b>datos.js</b>. Corre <code>python exportar.py</code> en esta carpeta y recarga.</div>';
+  return;
+}
+
+/* ================= utilidades ================= */
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const MES3 = MESES.map(m => m.slice(0,3));
+const DSEM = ["dom","lun","mar","mié","jue","vie","sáb"];
+const fmt = new Intl.NumberFormat("es-MX");
+const fmt1 = new Intl.NumberFormat("es-MX",{maximumFractionDigits:1, minimumFractionDigits:1});
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pd = s => { const [y,m,d] = s.split("-").map(Number); return new Date(Date.UTC(y,m-1,d)); };
+const iso = dt => dt.toISOString().slice(0,10);
+const dLabel = dt => `${DSEM[dt.getUTCDay()]} ${dt.getUTCDate()} ${MES3[dt.getUTCMonth()]}`;
+const cap = s => s[0].toUpperCase()+s.slice(1);
+function isoWeek(dt){ const t = new Date(dt); const day = (t.getUTCDay()+6)%7; t.setUTCDate(t.getUTCDate()-day+3);
+  const y = t.getUTCFullYear(); const f = new Date(Date.UTC(y,0,4));
+  return [y, 1 + Math.round(((t - f)/864e5 - 3 + ((f.getUTCDay()+6)%7))/7)]; }
+
+/* ================= datos preparados ================= */
+const DIAS = D.dias.map(pd);
+const ND = DIAS.length, NU = D.usuarios;
+const CECOS = D.cecos.map(([id, ceco, alias, depto, loc, site], i) => ({i, id, ceco, alias, depto, loc, site}));
+const NC = CECOS.length;
+// grupo g = (día, ceco) con sus usuarios en U[off[g]..off[g+1])
+const NG = D.reg.length;
+const gDia = new Int32Array(NG), gCeco = new Int32Array(NG), off = new Int32Array(NG+1);
+let tot = 0; for (const r of D.reg) tot += r.length - 2;
+const U = new Int32Array(tot);
+{ let p = 0; D.reg.forEach((r,g) => { gDia[g]=r[0]; gCeco[g]=r[1]; off[g]=p; for (let k=2;k<r.length;k++) U[p++]=r[k]; }); off[NG]=p; }
+const byCeco = Array.from({length:NG},(_,g)=>g).sort((a,b)=> gCeco[a]-gCeco[b] || gDia[a]-gDia[b]);
+
+const DIMS = [
+  {key:"loc",   label:"Locación",        search:false},
+  {key:"depto", label:"DeptoBiometrico", search:true},
+  {key:"alias", label:"Alias",           search:true},
+  {key:"ceco",  label:"Ceco",            search:true},
+];
+const OPTS = {};
+for (const d of DIMS){
+  const vals = [...new Set(CECOS.map(c=>c[d.key]))].sort((a,b)=> (a==="Sin dato")-(b==="Sin dato") || a.localeCompare(b,"es"));
+  OPTS[d.key] = vals; d.idx = new Map(vals.map((v,i)=>[v,i]));
+  CECOS.forEach(c => c["_"+d.key] = d.idx.get(c[d.key]));
+}
+
+// meses de toda la data (para el top 15)
+const MONTHS = [], dayMonth = new Int32Array(ND);
+DIAS.forEach((dt,d)=>{ const k=dt.getUTCFullYear()*12+dt.getUTCMonth();
+  if (!MONTHS.length || MONTHS[MONTHS.length-1].k!==k) MONTHS.push({k, y:dt.getUTCFullYear(), m:dt.getUTCMonth(), days:0});
+  MONTHS[MONTHS.length-1].days++; dayMonth[d]=MONTHS.length-1; });
+MONTHS.forEach(M=>{ M.partial = M.days < new Date(Date.UTC(M.y, M.m+1, 0)).getUTCDate(); M.label = MES3[M.m]; });
+const NM = MONTHS.length;
+
+/* ================= estado ================= */
+const S = {
+  gran:"dia", d0:0, d1:ND-1,
+  sel:{loc:new Set(), depto:new Set(), alias:new Set(), ceco:new Set()},
+  open:null, find:{loc:"", depto:"", alias:"", ceco:""},
+  focus:null, sort:{key:"maxD", dir:-1}, q:"",
+};
+
+/* ================= buckets ================= */
+function bucketsFor(gran){
+  const of = new Int32Array(ND).fill(-1), list = [];
+  let key = null;
+  for (let d=S.d0; d<=S.d1; d++){
+    const dt = DIAS[d]; let k, label, short;
+    if (gran==="dia"){ k=d; label=dLabel(dt); short=`${dt.getUTCDate()}`; }
+    else if (gran==="semana"){ const [y,w]=isoWeek(dt); k=y*100+w; label=`Semana ${w}`; short=`S${w}`; }
+    else { k=dt.getUTCFullYear()*100+dt.getUTCMonth(); label=cap(MESES[dt.getUTCMonth()]); short=MES3[dt.getUTCMonth()]; }
+    if (k!==key){ list.push({k,label,short,days:[]}); key=k; }
+    const b = list[list.length-1]; b.days.push(d); of[d]=list.length-1;
+  }
+  for (const b of list){
+    const a = DIAS[b.days[0]], z = DIAS[b.days[b.days.length-1]];
+    b.from = iso(a); b.to = iso(z);
+    if (gran==="semana"){
+      b.partial = b.days.length<7;
+      b.range = `${a.getUTCDate()} ${MES3[a.getUTCMonth()]} – ${z.getUTCDate()} ${MES3[z.getUTCMonth()]}`;
+    } else if (gran==="mes"){
+      const dim = new Date(Date.UTC(a.getUTCFullYear(), a.getUTCMonth()+1, 0)).getUTCDate();
+      b.partial = b.days.length<dim;
+      b.range = `${a.getUTCDate()} – ${z.getUTCDate()} ${MES3[z.getUTCMonth()]}`;
+    } else { b.partial=false; b.range=b.from; b.weekend = [0,6].includes(a.getUTCDay()); }
+  }
+  return {of, list};
+}
+
+/* ================= filtros ================= */
+function cecoPass(c, skip){
+  for (const d of DIMS){ if (d.key===skip) continue; const s=S.sel[d.key]; if (s.size && !s.has(c[d.key])) return false; }
+  return true;
+}
+
+/* ================= cálculo ================= */
+const stamp = new Int32Array(NU), stamp2 = new Int32Array(NU);
+let serial = 0;
+function compute(){
+  const B = bucketsFor(S.gran), NB = B.list.length;
+  const pass = CECOS.map(c=>cecoPass(c));
+  const uniq = new Int32Array(NB), daily = new Int32Array(ND);
+  let rangeU = 0; const rs = ++serial;
+  let lastB=-1, bs=0, lastD=-1, ds=0;
+  for (let g=0; g<NG; g++){                      // los grupos vienen ordenados por día
+    const d = gDia[g]; if (d<S.d0 || d>S.d1 || !pass[gCeco[g]]) continue;
+    const b = B.of[d];
+    if (b!==lastB){ lastB=b; bs=++serial; }
+    if (d!==lastD){ lastD=d; ds=++serial; }
+    for (let p=off[g]; p<off[g+1]; p++){
+      const u=U[p];
+      if (stamp2[u]!==ds){ stamp2[u]=ds; daily[d]++; }
+      if (stamp[u]!==bs){ stamp[u]=bs; uniq[b]++; }
+    }
+  }
+  for (let g=0; g<NG; g++){                      // únicos de todo el rango
+    const d=gDia[g]; if (d<S.d0 || d>S.d1 || !pass[gCeco[g]]) continue;
+    for (let p=off[g]; p<off[g+1]; p++){ const u=U[p]; if (stamp2[u]!==rs){ stamp2[u]=rs; rangeU++; } }
+  }
+  B.list.forEach((b,i)=>{ b.uniq=uniq[i]; });
+  return {B, vals:B.list.map(b=>b.uniq), daily, rangeU, pass};
+}
+
+// métricas por ceco sobre los días del foco (barra clicada) o del rango completo
+function computeCecos(R){
+  const days = S.focus!=null && R.B.list[S.focus] ? R.B.list[S.focus].days : null;
+  const dMin = days ? days[0] : S.d0, dMax = days ? days[days.length-1] : S.d1;
+  const NB = R.B.list.length;
+  const rows = CECOS.map(c=>({c, sumD:0, maxD:0, maxDay:-1, last:0, series:new Int32Array(NB), active:0, anyRange:false}));
+  let curC=-1, curB=-1, bs=0;
+  for (const g of byCeco){
+    const ci=gCeco[g]; if (!R.pass[ci]) continue;
+    const d=gDia[g]; if (d<S.d0 || d>S.d1) continue;
+    const row = rows[ci], n = off[g+1]-off[g], b = R.B.of[d];
+    row.anyRange = true;
+    if (ci!==curC){ curC=ci; curB=-1; }
+    if (b!==curB){ curB=b; bs=++serial; }
+    for (let p=off[g]; p<off[g+1]; p++){ const u=U[p]; if (stamp[u]!==bs){ stamp[u]=bs; row.series[b]++; } }
+    if (d<dMin || d>dMax) continue;
+    row.sumD+=n; row.active++;
+    if (n>row.maxD){ row.maxD=n; row.maxDay=d; }
+    if (d===dMax) row.last=n;
+  }
+  const nDays = dMax-dMin+1;
+  rows.forEach(r=> r.prom = r.sumD/nDays);
+  let sumAll=0, peak=0, peakDay=-1;
+  for (let d=dMin; d<=dMax; d++){ sumAll+=R.daily[d]; if (R.daily[d]>peak){ peak=R.daily[d]; peakDay=d; } }
+  return {rows: rows.filter(r=> r.active>0 || (days && r.anyRange)), dMin, dMax, nDays,
+          peak, peakDay, totalLast:R.daily[dMax], totalProm:sumAll/nDays};
+}
+
+// usuarios únicos por opción, respetando los demás filtros (cascada)
+function optCounts(key){
+  const nO = OPTS[key].length, cnt = new Int32Array(nO), seen = new Uint8Array(nO*NU);
+  const pass = CECOS.map(c=>cecoPass(c, key));
+  for (let g=0; g<NG; g++){
+    const d=gDia[g]; if (d<S.d0||d>S.d1) continue; const c=CECOS[gCeco[g]]; if (!pass[c.i]) continue;
+    const base=c["_"+key]*NU;
+    for (let p=off[g]; p<off[g+1]; p++){ const k=base+U[p]; if (!seen[k]){ seen[k]=1; cnt[c["_"+key]]++; } }
+  }
+  return cnt;
+}
+
+/* ================= render: filtros desplegables ================= */
+function ddValue(key){
+  const s=S.sel[key]; if (!s.size) return "Todos";
+  if (s.size===1) return [...s][0];
+  return `${s.size} elegidos`;
+}
+function renderFilters(){
+  const box = $("#dds");
+  // conservar foco y scroll del desplegable abierto
+  const act = document.activeElement, findFocus = act && act.classList.contains("find") ? act.selectionStart : null;
+  const oldList = box.querySelector(".opts"), scroll = oldList ? oldList.scrollTop : 0;
+  box.innerHTML = DIMS.map(dim=>{
+    const s=S.sel[dim.key], isOpen=S.open===dim.key;
+    let pop = "";
+    if (isOpen){
+      const cnt = optCounts(dim.key);
+      const q = S.find[dim.key].toLowerCase();
+      let opts = OPTS[dim.key].map((v,i)=>({v,n:cnt[i]}));
+      if (dim.key!=="loc") opts.sort((a,b)=> s.has(b.v)-s.has(a.v) || b.n-a.n || a.v.localeCompare(b.v,"es"));
+      if (q) opts = opts.filter(o=>o.v.toLowerCase().includes(q));
+      pop = `<div class="pop" role="dialog" aria-label="${dim.label}">
+        ${dim.search?`<input type="search" class="find" data-dim="${dim.key}" placeholder="Buscar ${dim.label.toLowerCase()} (${OPTS[dim.key].length})…" value="${esc(S.find[dim.key])}">`:""}
+        <div class="opts">${opts.map(o=>`<label class="opt${o.n===0?" zero":""}"><input type="checkbox" data-dim="${dim.key}" data-v="${esc(o.v)}" ${s.has(o.v)?"checked":""}><span class="t" title="${esc(o.v)}">${esc(o.v)}</span><span class="n">${fmt.format(o.n)}</span></label>`).join("") || `<div class="hint" style="padding:8px">Sin coincidencias.</div>`}</div>
+        <div class="pop-foot"><small>${s.size?`${s.size} de ${OPTS[dim.key].length}`:`${OPTS[dim.key].length} opciones`}</small>
+          <span style="display:flex; gap:14px"><button class="link" data-clear="${dim.key}" ${s.size?"":"disabled"}>Borrar filtro</button><button class="link" data-close>Listo</button></span></div>
+      </div>`;
+    }
+    return `<span class="dd${s.size?" on":""}${isOpen?" open":""}" data-dd="${dim.key}">
+      <button class="dd-btn" data-toggle="${dim.key}" aria-expanded="${isOpen}"><span class="lbl">${dim.label}</span><span class="val">${esc(ddValue(dim.key))}</span><span class="car">▼</span></button>
+      <button class="dd-clr" data-clear="${dim.key}" title="Borrar filtro de ${dim.label}" ${s.size?"":"disabled"}>×</button>${pop}</span>`;
+  }).join("");
+  const list = box.querySelector(".opts"); if (list) list.scrollTop = scroll;
+  const pop = box.querySelector(".pop");
+  if (pop && pop.getBoundingClientRect().right > innerWidth - 12){ pop.style.left="auto"; pop.style.right="0"; }
+  const f = box.querySelector(".find");
+  if (f && (findFocus!=null || S.justOpened)){ f.focus(); const p = findFocus ?? f.value.length; f.setSelectionRange(p,p); }
+  S.justOpened = false;
+  // fichas de filtros activos
+  const pills = DIMS.flatMap(dim=>[...S.sel[dim.key]].map(v=>`<span class="pill"><small>${dim.label}</small>${esc(v)}<button data-rm="${dim.key}" data-v="${esc(v)}" title="Quitar">×</button></span>`));
+  const a=$("#actives"); a.hidden = !pills.length;
+  a.innerHTML = pills.length ? `<span class="k">Filtros activos</span>${pills.join("")}` : "";
+}
+
+/* ================= render: KPIs ================= */
+function renderKpis(R, T){
+  const vals=R.vals; let mx=-1, mi=-1; vals.forEach((v,i)=>{ if(v>mx){mx=v; mi=i;} });
+  const unit = S.gran==="dia"?"día":S.gran==="semana"?"semana":"mes";
+  const b = R.B.list[mi];
+  const last = S.d1, prevWeek = last-7;
+  const lastV = R.daily[last], prevV = prevWeek>=S.d0 ? R.daily[prevWeek] : null;
+  let delta = "";
+  if (prevV!=null && prevV>0){ const pct=(lastV-prevV)/prevV*100; delta=`<span class="delta ${pct>=0?"up":"down"}">${fmt1.format(Math.abs(pct))}%</span> vs ${dLabel(DIAS[prevWeek])}`; }
+  let sumAll=0; for (let d=S.d0; d<=S.d1; d++) sumAll+=R.daily[d];
+  const activeCecos = new Set(); for (let g=0; g<NG; g++){ const d=gDia[g]; if (d>=S.d0 && d<=S.d1 && R.pass[gCeco[g]]) activeCecos.add(gCeco[g]); }
+  const nDays = S.d1-S.d0+1;
+  $("#kpis").innerHTML = `
+    <div class="panel kpi hero fade-in"><div class="k">Usuarios únicos en el rango</div><div class="v">${fmt.format(R.rangeU)}</div><div class="d">${nDays} días · ${dLabel(DIAS[S.d0])} → ${dLabel(DIAS[S.d1])}</div></div>
+    <div class="panel kpi fade-in"><div class="k">Promedio por día</div><div class="v">${fmt1.format(sumAll/nDays)}</div><div class="d">conectados diarios, incluye fines de semana</div></div>
+    <div class="panel kpi fade-in"><div class="k">Máximo por ${unit}</div><div class="v">${mx>=0?fmt.format(mx):"–"}</div><div class="d">${b? `${esc(b.label)}${S.gran!=="dia"?` · ${b.range}`:""}`:""}</div></div>
+    <div class="panel kpi fade-in"><div class="k">Último día · ${dLabel(DIAS[last])}</div><div class="v">${fmt.format(lastV)}</div><div class="d">${delta||"sin semana previa en el rango"}</div></div>
+    <div class="panel kpi fade-in"><div class="k">Cecos con conexión</div><div class="v">${activeCecos.size}<span style="font-size:.5em; color:var(--ink-3)"> / ${NC}</span></div><div class="d">con al menos un usuario en el rango</div></div>`;
+}
+
+/* ================= render: gráfico de barras ================= */
+const tip = $("#tip");
+function showTip(e, html){ tip.innerHTML=html; tip.classList.add("on");
+  const w=tip.offsetWidth, h=tip.offsetHeight; let x=e.clientX+14, y=e.clientY-h-12;
+  if (x+w>innerWidth-8) x=e.clientX-w-14; if (y<8) y=e.clientY+16; tip.style.left=x+"px"; tip.style.top=y+"px"; }
+function hideTip(){ tip.classList.remove("on"); }
+function niceStep(v){ if (v<=0) return 1; const p=Math.pow(10,Math.floor(Math.log10(v))), n=v/p; return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p; }
+
+function renderChart(R){
+  const el=$("#chart"), W=el.clientWidth, H=el.clientHeight;
+  const m={t:34,r:18,b:36,l:52}, iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const list=R.B.list, vals=R.vals, n=list.length;
+  let mx=0, mi=-1; vals.forEach((v,i)=>{ if (v>mx){mx=v; mi=i;} });
+  const step = niceStep(Math.max(mx*1.08,1)/4), nt = Math.max(1, Math.ceil(Math.max(mx*1.08,1)/step));
+  const ymax = step*nt, y = v => m.t + ih - v/ymax*ih;
+  const band = iw/Math.max(n,1), bw = Math.max(1, Math.min(band*(n>60?0.78:0.66), 64)), gap=(band-bw)/2;
+  const r = Math.min(4, bw/2);
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Usuarios conectados por ${S.gran}">`;
+  s += `<defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="var(--bar-soft)"/><line x1="0" y1="0" x2="0" y2="5" stroke="var(--bar)" stroke-width="2.4"/></pattern></defs>`;
+  s += `<g class="axis">`;
+  for (let k=0;k<=nt;k++){ const t=step*k, yy=y(t); s+=`<line class="gridline" x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}"/><text x="${m.l-10}" y="${yy+4}" text-anchor="end">${fmt.format(Math.round(t))}</text>`; }
+  const every = Math.max(1, Math.ceil(38/band));
+  list.forEach((b,i)=>{
+    const x = m.l + i*band + band/2; const dt = DIAS[b.days[0]];
+    let lab = null, strong=false;
+    if (S.gran==="dia"){
+      if (dt.getUTCDate()===1 || i===0){ lab = MES3[dt.getUTCMonth()]; strong=true; }
+      else if (band>=16 && dt.getUTCDay()===1) lab = String(dt.getUTCDate());
+      else if (band>=30) lab = String(dt.getUTCDate());
+    } else if (i%every===0) lab = b.short;
+    if (lab!=null){
+      s+=`<text x="${x}" y="${H-m.b+18}" text-anchor="middle" style="${strong?"fill:var(--ink-2);font-weight:500":""}">${lab}</text>`;
+      if (strong && S.gran==="dia" && i>0) s+=`<line x1="${m.l+i*band}" x2="${m.l+i*band}" y1="${m.t}" y2="${H-m.b+6}" stroke="var(--line)" stroke-dasharray="2 3"/>`;
+    }
+  });
+  s += `</g>`;
+  list.forEach((b,i)=>{
+    const v=vals[i], x=m.l+i*band+gap, yy=y(v), h=m.t+ih-yy;
+    let fill = b.partial ? "url(#hatch)" : (b.weekend ? "var(--bar-soft)" : "var(--bar)");
+    if (i===mi && !b.partial) fill = "var(--bar-hot)";
+    const dim = S.focus!=null && S.focus!==i;
+    if (h>0){ const rr=Math.min(r,h);
+      s+=`<path class="bar" d="M${x},${m.t+ih} V${yy+rr} Q${x},${yy} ${x+rr},${yy} H${x+bw-rr} Q${x+bw},${yy} ${x+bw},${yy+rr} V${m.t+ih} Z" fill="${fill}" opacity="${dim?.28:1}"/>`; }
+    if (S.focus===i) s+=`<rect x="${x-2}" y="${m.t-6}" width="${bw+4}" height="${ih+6}" fill="none" stroke="var(--accent)" stroke-width="1.5" rx="5" stroke-dasharray="3 3"/>`;
+  });
+  s += `<line class="baseline" x1="${m.l}" x2="${W-m.r}" y1="${m.t+ih}" y2="${m.t+ih}"/>`;
+  if (mi>=0){                                     // línea de máximo de lo visible
+    const ym=y(mx), txt=`MÁX ${fmt.format(mx)}`, tw=txt.length*7.1+16;
+    s+=`<line class="maxline" x1="${m.l}" x2="${W-m.r}" y1="${ym}" y2="${ym}"/>`;
+    s+=`<g class="maxtag"><rect x="${W-m.r-tw}" y="${ym-22}" width="${tw}" height="18" rx="9"/><text x="${W-m.r-tw/2}" y="${ym-9}" text-anchor="middle">${txt}</text></g>`;
+    const cx=m.l+mi*band+band/2, lx = Math.min(Math.max(cx, m.l+40), W-m.r-tw-60);
+    const lab = S.gran==="dia" ? `${list[mi].label} ${DIAS[list[mi].days[0]].getUTCFullYear()}` : `${list[mi].label} · ${list[mi].range}`;
+    s+=`<text class="vlabel" x="${lx}" y="${ym-8}" text-anchor="middle">${esc(lab)}</text>`;
+    s+=`<circle cx="${cx}" cy="${ym}" r="3.5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>`;
+  }
+  list.forEach((b,i)=>{ s+=`<rect class="hit" data-i="${i}" x="${m.l+i*band}" y="${m.t}" width="${band}" height="${ih}"/>`; });
+  s += `</svg>`;
+  el.innerHTML = s;
+  el.querySelectorAll(".hit").forEach(h=>{
+    const i=+h.dataset.i, b=list[i];
+    h.addEventListener("mousemove", e=>{
+      const pct = mx? vals[i]/mx*100 : 0;
+      const head = S.gran==="dia" ? `${dLabel(DIAS[b.days[0]])} ${DIAS[b.days[0]].getUTCFullYear()}` : `${b.label} <span style="color:var(--ink-3);font-weight:400">· ${b.range}</span>`;
+      let rows = `<div class="row">Usuarios conectados<b>${fmt.format(b.uniq)}</b></div>`;
+      if (S.gran!=="dia") rows += `<div class="row">Días<b>${b.days.length}${b.partial?" (parcial)":""}</b></div>`;
+      rows += `<div class="row">vs máximo<b>${fmt1.format(pct)}%</b></div>`;
+      showTip(e, `<div class="t">${head}</div>${rows}<div class="meter"><i style="width:${pct}%"></i></div>`);
+    });
+    h.addEventListener("mouseleave", hideTip);
+    h.addEventListener("click", ()=>{ S.focus = S.focus===i ? null : i; hideTip(); renderChart(R); renderTable(R); });
+  });
+  const unit = S.gran==="dia"?"día":S.gran==="semana"?"semana":"mes";
+  $("#chartTitle").textContent = `Usuarios conectados por ${unit}`;
+  let lg = `<span><i class="sw" style="background:var(--bar)"></i>${S.gran==="dia"?"Lunes a viernes":"Periodo completo"}</span>`;
+  lg += S.gran==="dia" ? `<span><i class="sw" style="background:var(--bar-soft)"></i>Sábado y domingo</span>` : `<span><i class="sw part"></i>Periodo parcial</span>`;
+  lg += `<span><i class="sw" style="background:var(--bar-hot)"></i>Barra máxima</span><span><i class="sw line"></i>Máximo de lo visible</span>`;
+  $("#legend").innerHTML = lg;
+}
+
+/* ================= top 15 por máximo día, mes a mes ================= */
+// Ignora el rango de fechas: siempre toda la data. Sí respeta los filtros.
+function computeTop(R){
+  const mm = new Int32Array(NC*NM), md = new Int32Array(NC*NM).fill(-1), best = new Int32Array(NC), bestDay = new Int32Array(NC).fill(-1);
+  for (let g=0; g<NG; g++){ const ci=gCeco[g]; if (!R.pass[ci]) continue;
+    const d=gDia[g], n=off[g+1]-off[g], k=ci*NM+dayMonth[d];
+    if (n>mm[k]){ mm[k]=n; md[k]=d; }
+    if (n>best[ci]){ best[ci]=n; bestDay[ci]=d; } }
+  const sum = a => a.reduce((x,y)=>x+y,0);
+  return CECOS.filter(c=>best[c.i]>0).map(c=>({c, best:best[c.i], bestDay:bestDay[c.i],
+      months:Array.from(mm.subarray(c.i*NM, c.i*NM+NM)), days:Array.from(md.subarray(c.i*NM, c.i*NM+NM))}))
+    .sort((a,b)=> b.best-a.best || sum(b.months)-sum(a.months)).slice(0,15);
+}
+let lastTop = [];
+// Resaltado: por defecto el top 5; con clic en la leyenda el usuario elige (máx. 8).
+// Cada ceco conserva su color mientras siga resaltado: el color sigue al ceco, no al puesto.
+const TOP_MAX_ON = 8, topColor = new Map();   // id ceco -> slot 1..8
+let topManual = false, topHover = null;
+function topSync(rows){
+  const ids = new Set(rows.map(r=>r.c.id));
+  for (const id of [...topColor.keys()]) if (!ids.has(id)) topColor.delete(id);
+  if (!topManual){ topColor.clear(); rows.slice(0,5).forEach((r,i)=>topColor.set(r.c.id, i+1)); }
+}
+function topToggle(id){
+  topManual = true;
+  if (topColor.has(id)) topColor.delete(id);
+  else if (topColor.size < TOP_MAX_ON){ const used=new Set(topColor.values()); let k=1; while(used.has(k)) k++; topColor.set(id,k); }
+  else { toast(`Máximo ${TOP_MAX_ON} cecos resaltados a la vez`); return; }
+  renderTop(R);
+}
+function renderTop(R){
+  const rows = lastTop = computeTop(R), el=$("#top"), lg=$("#topLegend");
+  const M0=MONTHS[0], M1=MONTHS[NM-1];
+  $("#topHint").textContent = `Ordenado por el día con más usuarios conectados · toda la data (${M0.label} ${M0.y} – ${M1.label} ${M1.y}), no depende del rango · clic en la leyenda para resaltar`;
+  if (!rows.length){ el.innerHTML = `<div class="empty">Ningún ceco coincide con los filtros.</div>`; lg.innerHTML=""; return; }
+  topSync(rows);
+  const W = el.clientWidth || 900, H = el.clientHeight || 530;
+  const m = {t:30, r:150, b:34, l:48}, iw = W-m.l-m.r, ih = H-m.t-m.b;
+  let mx=0, mxR=null, mxJ=-1; rows.forEach(r=>r.months.forEach((v,j)=>{ if (v>mx){ mx=v; mxR=r; mxJ=j; } }));
+  const step = niceStep(Math.max(mx*1.08,1)/5), nt = Math.max(1, Math.ceil(Math.max(mx*1.08,1)/step)), ymax = step*nt;
+  const X = j => m.l + (NM===1 ? iw/2 : j*iw/(NM-1)), Y = v => m.t + ih - v/ymax*ih;
+  const lastFull = MONTHS[NM-1].partial ? NM-2 : NM-1;
+  const col = id => topColor.has(id) ? `var(--s${topColor.get(id)})` : null;
+  const pathOf = (vals, j0, j1) => { let d=""; for (let j=j0;j<=j1;j++) d += (j===j0?"M":"L")+X(j).toFixed(1)+","+Y(vals[j]).toFixed(1); return d; };
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Máximo día por mes de los 15 cecos con más licencias">`;
+  s += `<g class="axis">`;
+  for (let k=0;k<=nt;k++){ const t=step*k, yy=Y(t); s+=`<line class="gridline" x1="${m.l}" x2="${W-m.r}" y1="${yy}" y2="${yy}"/><text x="${m.l-10}" y="${yy+4}" text-anchor="end">${fmt.format(t)}</text>`; }
+  MONTHS.forEach((M,j)=>{ s+=`<text x="${X(j)}" y="${H-m.b+20}" text-anchor="middle" style="${M.partial?"":"fill:var(--ink-2)"}">${M.label}${M.partial?"*":""}</text>`; });
+  s += `</g><line class="baseline" x1="${m.l}" x2="${W-m.r}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  // grises primero, resaltados encima
+  const order = [...rows].sort((a,b)=> (topColor.has(a.c.id)?1:0) - (topColor.has(b.c.id)?1:0));
+  for (const r of order){
+    const c = col(r.c.id), cls = c ? "" : " gray", id = r.c.id;
+    const st = c ? ` style="stroke:${c}"` : "";
+    if (lastFull>=0) s += `<path class="ln${cls}" data-id="${id}" d="${pathOf(r.months,0,lastFull)}"${st}/>`;
+    if (lastFull < NM-1 && lastFull>=0) s += `<path class="ln part${cls}" data-id="${id}" d="${pathOf(r.months,lastFull,NM-1)}"${st}/>`;
+    if (c) r.months.forEach((v,j)=>{ s += `<circle class="dot${MONTHS[j].partial?" hollow":""}" data-id="${id}" cx="${X(j)}" cy="${Y(v)}" r="4" style="fill:${c}; stroke:${MONTHS[j].partial?c:"var(--surface)"}"/>`; });
+  }
+  // etiquetas al final de las líneas resaltadas, separadas para que no se encimen
+  const labs = rows.filter(r=>topColor.has(r.c.id)).map(r=>({r, y:Y(r.months[NM-1])})).sort((a,b)=>a.y-b.y);
+  for (let i=1;i<labs.length;i++) if (labs[i].y - labs[i-1].y < 14) labs[i].y = labs[i-1].y + 14;
+  const over = labs.length ? labs[labs.length-1].y - (m.t+ih) : 0;
+  if (over>0) labs.forEach(l=>l.y-=over);
+  for (const l of labs){ const nm = l.r.c.alias.length>18 ? l.r.c.alias.slice(0,17)+"…" : l.r.c.alias;
+    s += `<text class="endlbl" data-id="${l.r.c.id}" x="${X(NM-1)+10}" y="${l.y+4}"><tspan style="fill:var(--s${topColor.get(l.r.c.id)})">●</tspan> ${esc(nm)} · ${fmt.format(l.r.months[NM-1])}</text>`; }
+  // máximo de lo visible
+  if (mxR){ const ym=Y(mx), txt=`MÁX ${fmt.format(mx)}`, tw=txt.length*7.1+16;
+    s += `<line class="maxline" x1="${m.l}" x2="${W-m.r}" y1="${ym}" y2="${ym}"/>`;
+    s += `<g class="maxtag"><rect x="${W-m.r-tw}" y="${ym-22}" width="${tw}" height="18" rx="9"/><text x="${W-m.r-tw/2}" y="${ym-9}" text-anchor="middle">${txt}</text></g>`;
+    s += `<text class="vlabel" x="${Math.min(Math.max(X(mxJ), m.l+60), W-m.r-tw-90)}" y="${ym-8}" text-anchor="middle">${esc(mxR.c.alias)} · ${cap(MESES[MONTHS[mxJ].m])}</text>`; }
+  // zonas para resaltar una línea al pasar por encima
+  for (const r of rows) s += `<path class="hitln" data-id="${r.c.id}" d="${pathOf(r.months,0,NM-1)}"/>`;
+  s += `<line class="xcross" id="topCross" x1="0" x2="0" y1="${m.t}" y2="${m.t+ih}" visibility="hidden"/>`;
+  s += `</svg>`;
+  el.innerHTML = s;
+
+  // leyenda con los 15
+  lg.innerHTML = `<div class="lh"><span>Top 15 · máx. histórico</span><button class="link" id="topReset" ${topManual?"":"disabled"}>Restablecer</button></div>` +
+    rows.map((r,i)=>{ const c=col(r.c.id);
+      return `<div class="tl${c?" on":""}" data-id="${r.c.id}" title="${esc(r.c.ceco)} · clic para ${c?"quitar":"resaltar"}">
+        <span class="rk">${String(i+1).padStart(2,"0")}</span><span class="sw2" style="${c?`background:${c}`:""}"></span>
+        <span class="nm"><b>${esc(r.c.alias)}</b><small>${esc(r.c.ceco)} · ${esc(r.c.loc)}</small></span>
+        <span class="mx">${fmt.format(r.best)}</span></div>`; }).join("");
+  const focus = id => { topHover=id; el.classList.toggle("focus", id!=null);
+    el.querySelectorAll("[data-id]").forEach(n=>n.classList.toggle("on", id!=null && +n.dataset.id===id));
+    lg.querySelectorAll(".tl").forEach(n=>n.classList.toggle("hl", id!=null && +n.dataset.id===id)); };
+  lg.querySelectorAll(".tl").forEach(n=>{ const id=+n.dataset.id;
+    n.addEventListener("mouseenter", ()=>focus(id)); n.addEventListener("mouseleave", ()=>focus(null));
+    n.addEventListener("click", ()=>topToggle(id)); });
+  $("#topReset").onclick = ()=>{ topManual=false; renderTop(R); };
+  el.querySelectorAll(".hitln").forEach(n=>{ const id=+n.dataset.id;
+    n.addEventListener("mouseenter", ()=>focus(id)); n.addEventListener("mouseleave", ()=>focus(null));
+    n.addEventListener("click", ()=>topToggle(id)); });
+
+  // cursor por mes: los 15 valores ordenados
+  const svg = el.querySelector("svg"), cross = el.querySelector("#topCross");
+  svg.addEventListener("mousemove", e=>{
+    const bx = svg.getBoundingClientRect(), x = e.clientX - bx.left;
+    if (x < m.l-20 || x > W-m.r+20){ cross.setAttribute("visibility","hidden"); hideTip(); return; }
+    const j = Math.max(0, Math.min(NM-1, Math.round((x-m.l)/(NM===1?1:iw/(NM-1))))), M=MONTHS[j];
+    cross.setAttribute("x1",X(j)); cross.setAttribute("x2",X(j)); cross.setAttribute("visibility","visible");
+    const list = [...rows].sort((a,b)=>b.months[j]-a.months[j]);
+    const rowsHtml = list.map(r=>{ const c=col(r.c.id), hl = topHover===r.c.id;
+      return `<div class="row${c||hl?"":" dim"}"><span><i style="background:${c||"var(--ink-3)"}"></i>${hl?"<b style='font:inherit;color:var(--ink)'>":""}${esc(r.c.alias)}${hl?"</b>":""}</span><b>${fmt.format(r.months[j])}</b></div>`; }).join("");
+    showTip(e, `<div class="t">${cap(MESES[M.m])} ${M.y}${M.partial?" · parcial":""} <span style="color:var(--ink-3);font-weight:400">· máximo día</span></div>${rowsHtml}`);
+  });
+  svg.addEventListener("mouseleave", ()=>{ cross.setAttribute("visibility","hidden"); hideTip(); });
+}
+
+/* ================= render: tabla ================= */
+function spark(series, w=96, h=26){
+  const n=series.length; if (n<2) return "";
+  let mx=0; for (const v of series) if (v>mx) mx=v; if (!mx) return `<svg class="spark" width="${w}" height="${h}"></svg>`;
+  const X=i=>2+i*(w-4)/(n-1), Y=v=>h-3-v/mx*(h-6);
+  let l="", mi=0; series.forEach((v,i)=>{ l+=(i?"L":"M")+X(i).toFixed(1)+","+Y(v).toFixed(1); if (v>series[mi]) mi=i; });
+  const a = l + `L${X(n-1).toFixed(1)},${h-1}L${X(0).toFixed(1)},${h-1}Z`;
+  return `<svg class="spark" width="${w}" height="${h}"><path class="a" d="${a}"/><path class="l" d="${l}"/><circle cx="${X(mi)}" cy="${Y(series[mi])}" r="2.5"/></svg>`;
+}
+const COLS = [
+  {k:"ceco", t:"Ceco", v:r=>r.c.ceco},
+  {k:"alias", t:"Alias", v:r=>r.c.alias},
+  {k:"depto", t:"DeptoBiometrico", v:r=>r.c.depto},
+  {k:"loc", t:"Locación", v:r=>r.c.loc},
+  {k:"site", t:"Site", v:r=>r.c.site},
+  {k:"maxD", t:"Máx. día", v:r=>r.maxD, r:true},
+  {k:"prom", t:"Prom. diario", v:r=>r.prom, r:true},
+  {k:"last", t:"Último día", v:r=>r.last, r:true},
+  {k:"trend", t:"Tendencia", nosort:true},
+];
+let lastTable = null;
+function tableRows(R){
+  const T = computeCecos(R);
+  const q = S.q.trim().toLowerCase();
+  let rows = T.rows.filter(r=> !q || [r.c.ceco,r.c.alias,r.c.depto,r.c.loc,r.c.site,String(r.c.id)].some(x=>String(x).toLowerCase().includes(q)));
+  const col = COLS.find(c=>c.k===S.sort.key) || COLS[5];
+  rows.sort((a,b)=>{ const x=col.v(a), y=col.v(b); return (typeof x==="number" ? x-y : String(x).localeCompare(String(y),"es")) * S.sort.dir; });
+  return {T, rows, q};
+}
+function renderTable(R){
+  const {T, rows, q} = tableRows(R);
+  lastTable = {T, rows};
+  const top = rows.reduce((m,r)=>Math.max(m,r.maxD),0) || 1;
+  const head = `<thead><tr>${COLS.map(c=>`<th class="${c.r?"r":""}" data-k="${c.k}" ${S.sort.key===c.k?`aria-sort="${S.sort.dir>0?"ascending":"descending"}"`:""}>${c.t}</th>`).join("")}</tr></thead>`;
+  const body = rows.length ? rows.map(r=>`<tr>
+      <td><div class="cname">${esc(r.c.ceco)}</div><div class="cid">id ${r.c.id}</div></td>
+      <td class="wr">${esc(r.c.alias)}</td><td class="wr">${esc(r.c.depto)}</td>
+      <td><span class="tag ${r.c.loc==="Interno"?"int":r.c.loc==="Externo"?"ext":""}">${esc(r.c.loc)}</span></td>
+      <td>${esc(r.c.site)}</td>
+      <td class="r"><div class="inbar"><span class="nums"><span class="num">${fmt.format(r.maxD)}</span><small>${r.maxDay>=0?dLabel(DIAS[r.maxDay]):"–"}</small></span><span class="track"><i style="width:${r.maxD/top*100}%"></i></span></div></td>
+      <td class="r num">${fmt1.format(r.prom)}</td>
+      <td class="r num">${fmt.format(r.last)}</td>
+      <td>${spark(Array.from(r.series))}</td></tr>`).join("")
+    : `<tr><td colspan="${COLS.length}" class="empty">Ningún ceco coincide con los filtros.</td></tr>`;
+  const foot = `<tfoot><tr><td colspan="5">Total · ${rows.length} cecos${q?" (el total ignora la búsqueda)":""}</td>
+      <td class="r"><div class="inbar"><span class="nums"><span class="num">${fmt.format(T.peak)}</span><small>${T.peakDay>=0?dLabel(DIAS[T.peakDay]):"–"}</small></span><span class="track" style="visibility:hidden"></span></div></td>
+      <td class="r num">${fmt1.format(T.totalProm)}</td><td class="r num">${fmt.format(T.totalLast)}</td><td></td></tr></tfoot>`;
+  $("#tbl").innerHTML = head + `<tbody>${body}</tbody>` + foot;
+  $("#tbl").querySelectorAll("th").forEach(th=>th.addEventListener("click",()=>{
+    const c=COLS.find(c=>c.k===th.dataset.k); if (c.nosort) return;
+    S.sort = S.sort.key===c.k ? {key:c.k, dir:-S.sort.dir} : {key:c.k, dir: c.r ? -1 : 1};
+    renderTable(R); }));
+  const unit = S.gran==="dia"?"día":S.gran==="semana"?"semana":"mes";
+  $("#tableHint").textContent = `${dLabel(DIAS[T.dMin])} → ${dLabel(DIAS[T.dMax])} · ${T.nDays} días · tendencia por ${unit} sobre todo el rango`;
+  const pill = $("#selPill");
+  if (S.focus!=null && R.B.list[S.focus]){ const b=R.B.list[S.focus];
+    pill.innerHTML = `<span class="sel-pill">Enfocado: ${esc(b.label)}${S.gran!=="dia"?` · ${b.range}`:""}<button id="unfocus" title="Quitar enfoque">×</button></span>`;
+    $("#unfocus").onclick = ()=>{ S.focus=null; renderChart(R); renderTable(R); };
+  } else pill.innerHTML = "";
+}
+
+/* ================= Excel (.xlsx real, sin librerías) ================= */
+// Un .xlsx es un zip de XML. Cada parte se comprime con el deflate nativo del navegador
+// (CompressionStream); si no existe, se guarda sin comprimir, que Excel también acepta.
+const CRC = (()=>{ const t=new Uint32Array(256); for (let n=0;n<256;n++){ let c=n; for (let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(b){ let c=0xFFFFFFFF; for (let i=0;i<b.length;i++) c = CRC[(c^b[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+async function deflate(data){
+  if (typeof CompressionStream === "undefined") return null;
+  try { return new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer()); }
+  catch(_){ return null; }
+}
+async function zip(files){
+  const enc=new TextEncoder(), parts=[], cen=[]; let offset=0;
+  for (const f of files){
+    const name=enc.encode(f.name), raw=enc.encode(f.data), crc=crc32(raw);
+    const packed = await deflate(raw), method = packed ? 8 : 0, data = packed || raw;
+    const h=new DataView(new ArrayBuffer(30));
+    h.setUint32(0,0x04034b50,true); h.setUint16(4,20,true); h.setUint16(6,0x0800,true); h.setUint16(8,method,true);
+    h.setUint16(10,0,true); h.setUint16(12,0x21,true); h.setUint32(14,crc,true);
+    h.setUint32(18,data.length,true); h.setUint32(22,raw.length,true); h.setUint16(26,name.length,true); h.setUint16(28,0,true);
+    parts.push(new Uint8Array(h.buffer), name, data);
+    const c=new DataView(new ArrayBuffer(46));
+    c.setUint32(0,0x02014b50,true); c.setUint16(4,20,true); c.setUint16(6,20,true); c.setUint16(8,0x0800,true); c.setUint16(10,method,true);
+    c.setUint16(12,0,true); c.setUint16(14,0x21,true); c.setUint32(16,crc,true); c.setUint32(20,data.length,true); c.setUint32(24,raw.length,true);
+    c.setUint16(28,name.length,true); c.setUint32(42,offset,true);
+    cen.push(new Uint8Array(c.buffer), name);
+    offset += 30+name.length+data.length;
+  }
+  const cenSize = cen.reduce((a,b)=>a+b.length,0);
+  const e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true); e.setUint16(8,files.length,true); e.setUint16(10,files.length,true);
+  e.setUint32(12,cenSize,true); e.setUint32(16,offset,true);
+  return new Blob([...parts, ...cen, new Uint8Array(e.buffer)], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+}
+const xesc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g,"");
+const colName = i => { let s=""; i++; while(i){ const m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); } return s; };
+const xlDate = isoStr => (pd(isoStr) - Date.UTC(1899,11,30))/864e5;
+// columnas: {t:título, w:ancho, type:"s"|"n"|"d"|"f1"}
+function sheetXml(cols, rows){
+  const hdr = `<row r="1">${cols.map((c,i)=>`<c r="${colName(i)}1" t="inlineStr" s="1"><is><t>${xesc(c.t)}</t></is></c>`).join("")}</row>`;
+  const body = rows.map((r,ri)=>{ const rn=ri+2;
+    return `<row r="${rn}">${r.map((v,i)=>{ const ref=colName(i)+rn, ty=cols[i].type;
+      if (v==null || v==="") return "";
+      if (ty==="n") return `<c r="${ref}"><v>${v}</v></c>`;
+      if (ty==="f1") return `<c r="${ref}" s="3"><v>${Math.round(v*10)/10}</v></c>`;
+      if (ty==="d") return `<c r="${ref}" s="2"><v>${xlDate(v)}</v></c>`;
+      return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xesc(v)}</t></is></c>`; }).join("")}</row>`; }).join("");
+  const last = colName(cols.length-1)+(rows.length+1);
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
+<cols>${cols.map((c,i)=>`<col min="${i+1}" max="${i+1}" width="${c.w||14}" customWidth="1"/>`).join("")}</cols>
+<sheetData>${hdr}${body}</sheetData>${rows.length?`<autoFilter ref="A1:${last}"/>`:""}</worksheet>`;
+}
+function workbook(sheets){
+  const files = [
+    {name:"[Content_Types].xml", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`},
+    {name:"_rels/.rels", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
+    {name:"xl/workbook.xml", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s,i)=>`<sheet name="${xesc(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets>${sheets.some(s=>s.rows.length)?`<definedNames>${sheets.map((s,i)=>s.rows.length?`<definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">'${xesc(s.name)}'!$A$1:$${colName(s.cols.length-1)}$${s.rows.length+1}</definedName>`:"").join("")}</definedNames>`:""}</workbook>`},
+    {name:"xl/_rels/workbook.xml.rels", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("")}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
+    {name:"xl/styles.xml", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="165" formatCode="0.0"/></numFmts><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF16150F"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`},
+    ...sheets.map((s,i)=>({name:`xl/worksheets/sheet${i+1}.xml`, data:sheetXml(s.cols, s.rows)})),
+  ];
+  return zip(files);
+}
+async function buildWorkbook(){
+  const unit = S.gran==="dia"?"Día":S.gran==="semana"?"Semana":"Mes";
+  const g = S.gran==="dia"
+    ? R.B.list.map(b=>[b.from, DSEM[DIAS[b.days[0]].getUTCDay()], b.uniq])
+    : R.B.list.map(b=>[b.label, b.from, b.to, b.days.length, b.uniq, b.partial?"Sí":"No"]);
+  const gCols = S.gran==="dia"
+    ? [{t:"Fecha",w:12,type:"d"},{t:"Día",w:6},{t:"Usuarios conectados",w:20,type:"n"}]
+    : [{t:unit,w:18},{t:"Desde",w:12,type:"d"},{t:"Hasta",w:12,type:"d"},{t:"Días",w:7,type:"n"},{t:"Usuarios conectados",w:20,type:"n"},{t:"Periodo parcial",w:15}];
+  const {T, rows} = lastTable;
+  const c = rows.map(r=>[r.c.id, r.c.ceco, r.c.alias, r.c.depto, r.c.loc, r.c.site, r.maxD, r.maxDay>=0?D.dias[r.maxDay]:"", r.prom, r.last]);
+  const det = [];
+  for (let gi=0; gi<NG; gi++){ const d=gDia[gi], ci=gCeco[gi]; if (d<S.d0||d>S.d1||!R.pass[ci]) continue; const cc=CECOS[ci];
+    det.push([D.dias[d], DSEM[DIAS[d].getUTCDay()], cc.id, cc.ceco, cc.alias, cc.depto, cc.loc, cc.site, off[gi+1]-off[gi]]); }
+  // tbl_dashboard_users_intelix reconstruida: mismas 11 columnas, todas las filas, sin filtros ni rango
+  const extraMap = new Map();
+  for (const [d,ci,u,id] of (D.extra||[])){ const k=d+"|"+ci+"|"+u; if (!extraMap.has(k)) extraMap.set(k,[]); extraMap.get(k).push(id); }
+  const bruta = [];
+  for (let gi=0; gi<NG; gi++){ const d=gDia[gi], ci=gCeco[gi], cc=CECOS[ci], f=D.dias[d], per=MESES[DIAS[d].getUTCMonth()];
+    for (let p=off[gi]; p<off[gi+1]; p++){ const u=U[p], [hr,id]=D.uids[u];
+      bruta.push([id, hr, cc.id, cc.ceco, cc.depto, cc.alias, cc.site, cc.loc, +hr, per, f]);
+      const ex = extraMap.get(d+"|"+ci+"|"+u); if (ex) for (const id2 of ex) bruta.push([id2, hr, cc.id, cc.ceco, cc.depto, cc.alias, cc.site, cc.loc, +hr, per, f]); } }
+  const sel = k => S.sel[k].size ? [...S.sel[k]].join(", ") : "Todos";
+  const foco = S.focus!=null && R.B.list[S.focus] ? `${R.B.list[S.focus].label} (${R.B.list[S.focus].from} a ${R.B.list[S.focus].to})` : "Sin enfoque";
+  const info = [["Reporte","Licencias Intelix"],["Desde",D.dias[S.d0]],["Hasta",D.dias[S.d1]],["Vista",unit],
+    ["Locación",sel("loc")],["DeptoBiometrico",sel("depto")],["Alias",sel("alias")],["Ceco",sel("ceco")],["Enfoque de la tabla",foco],
+    ["Búsqueda en tabla",S.q||"Ninguna"],["Usuarios únicos en el rango",R.rangeU],["Fuente",D.fuente],["Datos exportados",D.generado],
+    ["Nota","Usuarios = id_HR distintos. En semana y mes cuenta personas distintas del periodo, no la suma de los días."],
+    ["Data bruta","Todas las filas de la tabla (" + fmt.format(D.filasTabla) + "), sin filtros ni rango. Textos sin espacios colgados y con mayúsculas unificadas."]];
+  return workbook([
+    {name:"Grafico", cols:gCols, rows:g},
+    {name:"Detalle ceco", cols:[{t:"Id ceco",w:9,type:"n"},{t:"Ceco",w:32},{t:"Alias",w:28},{t:"DeptoBiometrico",w:24},{t:"Locación",w:11},{t:"Site",w:14},{t:"Máx. día",w:10,type:"n"},{t:"Fecha máx.",w:12,type:"d"},{t:"Prom. diario",w:12,type:"f1"},{t:"Último día",w:11,type:"n"}], rows:c},
+    {name:"Dia x ceco", cols:[{t:"Fecha",w:12,type:"d"},{t:"Día",w:6},{t:"Id ceco",w:9,type:"n"},{t:"Ceco",w:32},{t:"Alias",w:28},{t:"DeptoBiometrico",w:24},{t:"Locación",w:11},{t:"Site",w:14},{t:"Usuarios",w:10,type:"n"}], rows:det},
+    {name:"Top 15 mensual", cols:[{t:"Posición",w:9,type:"n"},{t:"Id ceco",w:9,type:"n"},{t:"Ceco",w:32},{t:"Alias",w:28},{t:"Locación",w:11},
+      ...MONTHS.map(M=>({t:`Máx. ${M.label} ${M.y}${M.partial?" (parcial)":""}`,w:13,type:"n"})),{t:"Máx. histórico",w:14,type:"n"},{t:"Fecha máx.",w:12,type:"d"}],
+      rows:lastTop.map((r,i)=>[i+1, r.c.id, r.c.ceco, r.c.alias, r.c.loc, ...r.months, r.best, D.dias[r.bestDay]])},
+    {name:"Filtros", cols:[{t:"Concepto",w:28},{t:"Valor",w:90}], rows:info},
+    {name:"Data bruta", cols:[{t:"id",w:9,type:"n"},{t:"id_HR",w:10},{t:"id_ceco",w:9,type:"n"},{t:"ceco",w:32},{t:"DeptoBiometrico",w:24},{t:"alias",w:28},{t:"SITE",w:14},{t:"locacion",w:11},{t:"usuario",w:10,type:"n"},{t:"PERIODO",w:12},{t:"FECHA",w:12,type:"d"}], rows:bruta},
+  ]);
+}
+window.__buildWorkbook = buildWorkbook;   // lo usa la prueba automática
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("on"),2600); }
+$("#xlsx").addEventListener("click", async ()=>{
+  const btn=$("#xlsx"), txt=btn.innerHTML;
+  btn.disabled=true; btn.innerHTML="Generando…";
+  await new Promise(r=>setTimeout(r,30));          // deja pintar el estado antes del trabajo pesado
+  try{
+    const blob = await buildWorkbook(), a=document.createElement("a"), now=new Date();
+    const stampName = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}${String(now.getDate()).padStart(2,"0")}_${String(now.getHours()).padStart(2,"0")}${String(now.getMinutes()).padStart(2,"0")}`;
+    a.href = URL.createObjectURL(blob); a.download = `licencias_intelix_${stampName}.xlsx`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+    toast("Excel generado con los filtros actuales");
+  }catch(err){ console.error(err); toast("No se pudo generar el Excel: "+err.message); }
+  finally{ btn.disabled=false; btn.innerHTML=txt; }
+});
+
+/* ================= orquestación ================= */
+let R = null;
+function renderAll(){
+  R = compute();
+  if (S.focus!=null && S.focus>=R.B.list.length) S.focus=null;
+  renderFilters(); renderChart(R); renderTable(R); renderKpis(R); renderTop(R);
+}
+
+$("#gran").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return;
+  S.gran=b.dataset.v; S.focus=null;
+  $("#gran").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed", x===b));
+  renderAll(); });
+
+const i0=$("#d0"), i1=$("#d1");
+i0.min=i1.min=D.dias[0]; i0.max=i1.max=D.dias[ND-1];
+function syncRange(){ i0.value=D.dias[S.d0]; i1.value=D.dias[S.d1]; }
+function setRange(a,b){ S.d0=Math.max(0,Math.min(a,b)); S.d1=Math.min(ND-1,Math.max(a,b)); S.focus=null; syncRange(); renderAll(); }
+const idxOf = v => { const t=D.dias.indexOf(v); if (t>=0) return t; return v<D.dias[0]?0:ND-1; };
+i0.addEventListener("change",()=>setRange(idxOf(i0.value), S.d1));
+i1.addEventListener("change",()=>setRange(S.d0, idxOf(i1.value)));
+document.querySelectorAll(".preset").forEach(b=>b.addEventListener("click",()=>{
+  const p=b.dataset.p, z=ND-1;
+  if (p==="todo") setRange(0,z);
+  else if (p==="mes"){ const m=DIAS[z].getUTCMonth(); let a=z; while(a>0 && DIAS[a-1].getUTCMonth()===m) a--; setRange(a,z); }
+  else setRange(Math.max(0,z-(+p)+1), z);
+}));
+
+// filtros: todo por delegación sobre la barra
+$("#toolbar").addEventListener("click", e=>{
+  const tg=e.target.closest("[data-toggle]");
+  if (tg){ const k=tg.dataset.toggle; S.open = S.open===k?null:k; S.justOpened = S.open!=null; renderFilters(); return; }
+  const cl=e.target.closest("[data-clear]");
+  if (cl){ S.sel[cl.dataset.clear].clear(); S.focus=null; renderAll(); return; }
+  const rm=e.target.closest("[data-rm]");
+  if (rm){ S.sel[rm.dataset.rm].delete(rm.dataset.v); S.focus=null; renderAll(); return; }
+  if (e.target.closest("[data-close]")){ S.open=null; renderFilters(); }
+});
+$("#toolbar").addEventListener("change", e=>{
+  const cb=e.target; if (cb.type!=="checkbox") return;
+  const s=S.sel[cb.dataset.dim]; cb.checked ? s.add(cb.dataset.v) : s.delete(cb.dataset.v); S.focus=null; renderAll();
+});
+$("#toolbar").addEventListener("input", e=>{ if (e.target.classList.contains("find")){ S.find[e.target.dataset.dim]=e.target.value; renderFilters(); } });
+document.addEventListener("click", e=>{ if (S.open && !e.target.closest(".dd")){ S.open=null; renderFilters(); } });
+document.addEventListener("keydown", e=>{ if (e.key==="Escape" && S.open){ S.open=null; renderFilters(); } });
+$("#resetAll").addEventListener("click", ()=>{ for (const k in S.sel){ S.sel[k].clear(); S.find[k]=""; } S.open=null; S.focus=null; renderAll(); });
+$("#q").addEventListener("input", e=>{ S.q=e.target.value; renderTable(R); });
+
+// tema
+const root=document.documentElement;
+const sysDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
+function applyTheme(t){ if (t) root.setAttribute("data-theme",t); else root.removeAttribute("data-theme");
+  $("#themeLbl").textContent = (t || (sysDark()?"dark":"light"))==="dark" ? "Oscuro" : "Claro"; }
+let theme=null; try{ theme=localStorage.getItem("dashConexTema"); }catch(_){}
+applyTheme(theme);
+$("#theme").addEventListener("click", ()=>{ const cur = root.getAttribute("data-theme") || (sysDark()?"dark":"light");
+  const nx = cur==="dark"?"light":"dark"; applyTheme(nx); try{ localStorage.setItem("dashConexTema",nx); }catch(_){} if (R){ renderChart(R); renderTop(R); } });
+
+$("#stamp").innerHTML = `Datos al <b>${dLabel(DIAS[ND-1])} ${DIAS[ND-1].getUTCFullYear()}</b><br>exportado ${esc(D.generado)} · ${fmt.format(NU)} usuarios · ${NC} cecos`;
+
+let rt; const reChart = ()=>{ clearTimeout(rt); rt=setTimeout(()=>{ if (R){ renderChart(R); renderTop(R); } },80); };
+new ResizeObserver(reChart).observe($("#chart")); addEventListener("resize", reChart);
+
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>R&&renderChart(R));
+// arranque: últimos 90 días en vista diaria
+S.d0 = Math.max(0, ND-90); syncRange();
+renderAll();
+})();
+</script>
 </body>
 </html>

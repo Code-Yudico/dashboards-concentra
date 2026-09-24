@@ -1,8 +1,10 @@
 services:
-  # Rama alterna sin Grafana: un contenedor extrae la vista una vez al día
-  # (dashboard-etl) y otro sirve el HTML estático que la renderiza
-  # (dashboard-web). Ver docs/ARQUITECTURA.md para la comparación con la
-  # rama Grafana (main).
+  # Rama alterna sin Grafana: un contenedor extrae la tabla de conexiones
+  # Intelix una vez al día (dashboard-etl) y otro sirve el dashboard HTML
+  # que la renderiza (dashboard-web). Dashboard y lógica de negocio
+  # portados de un proyecto existente ("dash_conexiones_intelix") — ver
+  # docs/ARQUITECTURA.md para la referencia y la comparación con la rama
+  # Grafana (main).
   dashboard-etl:
     build:
       context: ./etl-diario
@@ -12,13 +14,14 @@ services:
       TZ: ${TZ}
       SNAPSHOT_CRON_SCHEDULE: ${SNAPSHOT_CRON_SCHEDULE}
       SNAPSHOT_OUTPUT_PATH: ${SNAPSHOT_OUTPUT_PATH}
-      # Mismo origen y patrón de credenciales que ya usa la rama Grafana
-      # para este datasource (grafana/provisioning/datasources/mssql-intelix.yaml).
-      MSSQL_INTELIX_HOST: ${MSSQL_INTELIX_HOST}
-      MSSQL_INTELIX_PORT: ${MSSQL_INTELIX_PORT}
-      MSSQL_INTELIX_DB: ${MSSQL_INTELIX_DB}
-      MSSQL_INTELIX_USER: ${MSSQL_INTELIX_USER}
-      MSSQL_INTELIX_PASS: ${MSSQL_INTELIX_PASS}
+      # gc_wfm.dbo.tbl_dashboard_users_intelix en 10.80.11.70\DEV — tabla
+      # cruda de conexiones (no la vista agregada del datasource Grafana).
+      MSSQL_INTELIX_1_HOST: ${MSSQL_INTELIX_1_HOST}
+      MSSQL_INTELIX_1_DB: ${MSSQL_INTELIX_1_DB}
+      MSSQL_INTELIX_1_USER: ${MSSQL_INTELIX_1_USER}
+      MSSQL_INTELIX_1_PASS: ${MSSQL_INTELIX_1_PASS}
+      MSSQL_INTELIX_1_ENCRYPT: ${MSSQL_INTELIX_1_ENCRYPT}
+      MSSQL_INTELIX_1_TRUST_CERT: ${MSSQL_INTELIX_1_TRUST_CERT}
     volumes:
       - dashboard_data:/data
     networks:

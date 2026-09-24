@@ -22,26 +22,28 @@ docker compose down -v    # además destruye el volumen (se pierde el snapshot) 
 
 ## Verificar conectividad a SQL Server
 
-Desde el host (requiere `sqlcmd`/`msodbcsql18`, ya instalados en la distro WSL "dashboards"):
+`10.80.11.70\DEV` es una instancia nombrada (sin puerto fijo, se resuelve por SQL Browser) —
+distinta del patrón host+puerto fijo que usa el resto del proyecto. Desde el host (requiere
+`sqlcmd`/`msodbcsql17`/`18`, ya instalados en la distro WSL "dashboards"):
 
 ```bash
-sqlcmd -S "$MSSQL_INTELIX_HOST,$MSSQL_INTELIX_PORT" -d "$MSSQL_INTELIX_DB" \
-  -U "$MSSQL_INTELIX_USER" -P '<password>' -C \
-  -Q "SELECT TOP 10 * FROM dbo.vw_dashboard_usuarios_intelix"
+sqlcmd -S "$MSSQL_INTELIX_1_HOST" -d "$MSSQL_INTELIX_1_DB" \
+  -U "$MSSQL_INTELIX_1_USER" -P '<password>' -C \
+  -Q "SELECT TOP 10 * FROM dbo.tbl_dashboard_users_intelix"
 ```
 
-`-C` confía en el certificado del servidor (equivalente a `MSSQL_INTELIX_TRUST_CERT=yes`). Si
+`-C` confía en el certificado del servidor (equivalente a `MSSQL_INTELIX_1_TRUST_CERT=yes`). Si
 esto falla con error de autenticación, el problema está en la credencial o en los permisos
-otorgados — no en el script `extraer_snapshot.py`.
+otorgados — no en el script `exportar.py`.
 
-## Verificar el snapshot y el cron de `dashboard-etl`
+## Verificar `datos.js` y el cron de `dashboard-etl`
 
 ```bash
 # Forzar una extracción manual (útil para probar cambios sin esperar al cron)
-docker compose exec dashboard-etl python3 extraer_snapshot.py
+docker compose exec dashboard-etl python3 exportar.py
 
-# Ver el snapshot generado
-docker compose exec dashboard-etl cat /data/snapshot.json | head -c 500
+# Ver el datos.js generado (formato: window.DASH_CONEX = {...})
+docker compose exec dashboard-etl cat /data/datos.js | head -c 500
 
 # Confirmar el horario programado dentro del contenedor
 docker compose exec dashboard-etl cat /etc/cron.d/snapshot-cron
@@ -50,31 +52,35 @@ docker compose exec dashboard-etl cat /etc/cron.d/snapshot-cron
 docker compose exec dashboard-etl cat /var/log/snapshot-cron.log
 ```
 
-Si `snapshot.json` no existe o está vacío, revisar primero conectividad SQL (sección anterior) —
-el mismo error de credencial/base/host se manifiesta igual aquí que en Grafana (ver "Lecciones
-sobre depuración de conectividad SQL Server" en `CLAUDE.md`).
+Si `datos.js` no existe o está vacío, revisar primero conectividad SQL (sección anterior) — el
+mismo error de credencial/base/host se manifiesta igual aquí que en Grafana (ver "Lecciones sobre
+depuración de conectividad SQL Server" en `CLAUDE.md`). `exportar.py` también aborta (sin escribir
+`datos.js`) si la tabla está vacía, si la reconstrucción de filas no cuadra, o si algún usuario-día
+queda sin su id principal — son validaciones de integridad del original, no bugs del puerto.
 
 ## Probar el dashboard web
 
 1. Abrir `http://localhost:8081` — debe pedir usuario/contraseña (auth básica de nginx).
-2. Si no carga datos ("snapshot no tiene registros"), confirmar que `dashboard-etl` ya escribió
-   `/data/snapshot.json` (sección anterior) y que el volumen `dc_dashboard_data` está compartido
-   entre ambos servicios: `docker compose exec dashboard-web ls -la /usr/share/nginx/html/data`.
+2. Si el dashboard queda en blanco o sin datos, confirmar que `dashboard-etl` ya escribió
+   `/data/datos.js` (sección anterior) y que el volumen `dc_dashboard_data` está compartido entre
+   ambos servicios: `docker compose exec dashboard-web ls -la /usr/share/nginx/html/data`.
 3. Si pide usuario/contraseña pero rechaza credenciales correctas, confirmar que
    `NGINX_BASIC_AUTH_USER`/`NGINX_BASIC_AUTH_PASS` están definidas en el `.env` — el contenedor
    se niega a arrancar si faltan (ver `web/docker-entrypoint.sh`).
-4. Probar los tres selectores (agrupar por, granularidad, tipo de gráfico) y el rangeslider/zoom
-   temporal del gráfico.
+4. Probar los filtros desplegables (locación, DeptoBiometrico, alias, ceco), el cambio de
+   granularidad (día/semana/mes), el top 15 de cecos y la descarga a Excel.
 
-## Actualizar el HTML/JS del dashboard
+## Actualizar el dashboard (`web/index.html`)
 
-Editar `web/index.html`, `web/app.js` o `web/style.css` y reconstruir la imagen:
+Es un archivo único autocontenido (HTML + CSS + JS inline, sin build step). Editarlo y reconstruir
+la imagen:
 
 ```bash
 docker compose up -d --build dashboard-web
 ```
 
-No hace falta redeploy de `dashboard-etl` para cambios solo de frontend.
+No hace falta redeploy de `dashboard-etl` para cambios solo de frontend. Para cambios a la lógica
+de extracción/conteo, editar `etl-diario/exportar.py` y reconstruir ese servicio en su lugar.
 
 ## Si cambia la IP de origen del equipo de desarrollo
 
@@ -86,11 +92,11 @@ la conectividad sin aviso. Ante un fallo repentino de conexión que antes funcio
 2. Pedir al DBA que actualice la regla de firewall/whitelist con la IP nueva, o —preferible—
    migrar la regla para que filtre por credencial en vez de por IP.
 
-## Si rotan la contraseña de `GenJYudico` (credencial Intelix)
+## Si rotan la contraseña del origen Intelix 1
 
-1. Actualizar `MSSQL_INTELIX_PASS` en el `.env` real (nunca en `.env.example`).
+1. Actualizar `MSSQL_INTELIX_1_PASS` en el `.env` real (nunca en `.env.example`).
 2. `docker compose up -d --force-recreate dashboard-etl`.
-3. Forzar una extracción manual y repetir la verificación de "Verificar el snapshot y el cron".
+3. Forzar una extracción manual y repetir la verificación de "Verificar `datos.js` y el cron".
 
 ## Desinstalación limpia (WSL2 como unidad desechable)
 
@@ -126,17 +132,49 @@ distro y clonar el repo.
   contradice la decisión explícita de no exponer este equipo a internet (ver `CLAUDE.md`, sección
   "Próximos pasos"). Dejar esos campos vacíos.
 - **Antes de dar por cerrado el despliegue**, validar que el servidor de Coolify tiene ruta de
-  red hacia SQL Server Intelix (`$MSSQL_INTELIX_HOST:$MSSQL_INTELIX_PORT`) — es un supuesto
-  externo, coordinado en paralelo con el equipo de infraestructura (ver `docs/ARQUITECTURA.md`).
+  red hacia `$MSSQL_INTELIX_1_HOST` (instancia nombrada, sin puerto fijo — puede necesitar que
+  SQL Browser/UDP 1434 también sea alcanzable, a diferencia de los otros orígenes de este
+  proyecto que usan IP+puerto fijo) — es un supuesto externo, coordinado en paralelo con el
+  equipo de infraestructura (ver `docs/ARQUITECTURA.md`).
 - Confirmar que el volumen nombrado `dc_dashboard_data` no se destruye en cada redeploy (ahí vive
-  el `snapshot.json` vigente).
+  el `datos.js` vigente).
 - **Alcance de red actual:** igual que Grafana hoy, el puerto publicado (`8081`) solo es
   alcanzable desde este mismo equipo (`localhost:8081`) mientras WSL2 siga en modo NAT clásico.
-  Para que sea alcanzable desde otros nodos de la red de oficina (el objetivo real de esta rama,
-  aclarado con el usuario: no es abrirlo a "toda la compañía" como usuarios, sino a "casi
-  cualquier nodo de red"), aplica el mismo pendiente ya documentado: activar
-  `networkingMode=mirrored` en `.wslconfig` y abrir el puerto en el Firewall de Windows (ver
-  "Próximos pasos" en `CLAUDE.md`). No se ha hecho todavía para ninguna de las dos ramas.
+  El objetivo real de esta rama (aclarado con el usuario) no es abrirlo a "toda la compañía" como
+  usuarios, sino a "casi cualquier nodo de red" de la oficina — ver la sección siguiente para
+  cómo lograrlo en este equipo.
+
+### Exponer en la red de oficina — `networkingMode=mirrored` NO es viable en este equipo
+
+`CLAUDE.md` menciona `networkingMode=mirrored` como el plan original para esto, pero ese modo
+**requiere Windows 11** (build 22621+). Este equipo es Windows 10 Pro y **no se va a actualizar a
+Windows 11** (confirmado con el usuario) — descartar esa vía por completo, no solo posponerla.
+
+**Alternativa que sí funciona en Windows 10: `netsh interface portproxy` + regla de Firewall.**
+WSL2 en modo NAT le asigna a la distro una IP interna (`172.x.x.x`) que Windows sí puede
+alcanzar; el truco es reenviar el tráfico que llega a la IP real del equipo (la de la red de
+oficina) hacia esa IP interna, y abrir el puerto en el Firewall de Windows.
+
+**Problema a tener presente:** esa IP interna de WSL2 **cambia en cada reinicio** de WSL (`wsl
+--shutdown` o reinicio de Windows) — a diferencia de `mirrored`, este método no es "configurar
+una vez y listo".
+
+Prueba manual rápida (PowerShell **como Administrador**, con WSL corriendo):
+```powershell
+$wslIp = (wsl -d dashboards -- hostname -I).Trim().Split(" ")[0]
+netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8081 connectaddress=$wslIp connectport=8081
+New-NetFirewallRule -DisplayName "WSL-dashboards-8081" -Direction Inbound -LocalPort 8081 -Protocol TCP -Action Allow
+```
+Verificar desde otra máquina de la red: `http://<ip-del-equipo-en-la-red-de-oficina>:8081`.
+
+**Para que sobreviva a reinicios:** usar `windows/wsl-portproxy.ps1` (versionado en este repo,
+cubre los puertos `8081` de esta rama y `3000` de Grafana) y programarlo como **Tarea Programada
+de Windows** (Task Scheduler) con disparador "Al iniciar sesión", ejecutándose como
+Administrador, para que se re-ejecute automáticamente y actualice la regla con la IP nueva de
+WSL2 cada vez que el equipo arranca.
+
+Actualizar `CLAUDE.md` (sección "Próximos pasos") para reflejar este cambio de plan la próxima
+vez que se edite — sigue mencionando `mirrored` como si fuera viable.
 
 ### Nota: el gotcha de "Preserve Repository During Deployment" de `main` no aplica igual aquí
 
@@ -152,9 +190,9 @@ afecte el build en sí (no solo el post-deploy), sí sería un problema.
 Verificación tras cada deploy nuevo:
 ```bash
 docker exec <contenedor-dashboard-web> ls /usr/share/nginx/html
-# debe listar index.html, app.js, style.css (no un directorio vacío)
+# debe listar index.html (no un directorio vacío)
 docker exec <contenedor-dashboard-etl> cat /etc/cron.d/snapshot-cron
-# debe mostrar el horario y las variables MSSQL_INTELIX_*, no un archivo vacío/inexistente
+# debe mostrar el horario y las variables MSSQL_INTELIX_1_*, no un archivo vacío/inexistente
 ```
 
 ### Coolify local (provisional) — acceso y notas

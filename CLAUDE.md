@@ -129,6 +129,11 @@ confundir:
 - El error `Invalid object name` (Msg 208) al referenciar una base entre bases de datos también
   puede ser SQL Server ocultando deliberadamente que no tienes permiso (no siempre significa que
   el objeto no existe).
+- **No poner instancias nombradas con barra invertida (`HOST\INSTANCIA`) en variables de
+  Coolify**: Coolify guarda la barra duplicada (`\\`), el driver busca una instancia inexistente
+  y falla con `Login timeout expired` — parece red/firewall y no lo es. Usar siempre `IP,puerto`
+  (el puerto de una instancia nombrada se obtiene del SQL Browser, UDP 1434). Para verificar el
+  valor real dentro del contenedor: `docker exec <contenedor> printenv VAR | od -c`.
 
 ## Entorno de desarrollo
 

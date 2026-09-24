@@ -8,7 +8,7 @@ datasources:
   - name: SQL Server Intelix (DEV)
     type: mssql
     access: proxy
-    url: ${MSSQL_INTELIX_HOST}
+    url: ${MSSQL_INTELIX_HOST},${MSSQL_INTELIX_PORT}
     database: ${MSSQL_INTELIX_DB}
     user: ${MSSQL_INTELIX_USER}
     secureJsonData:

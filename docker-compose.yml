@@ -14,7 +14,7 @@ services:
       TZ: ${TZ}
       SNAPSHOT_CRON_SCHEDULE: ${SNAPSHOT_CRON_SCHEDULE}
       SNAPSHOT_OUTPUT_PATH: ${SNAPSHOT_OUTPUT_PATH}
-      # gc_wfm.dbo.tbl_dashboard_users_intelix en 10.80.11.70\DEV — tabla
+      # gc_wfm.dbo.tbl_dashboard_users_intelix en 10.80.11.70,1433 (instancia DEV) — tabla
       # cruda de conexiones (no la vista agregada del datasource Grafana).
       MSSQL_INTELIX_1_HOST: ${MSSQL_INTELIX_1_HOST}
       MSSQL_INTELIX_1_DB: ${MSSQL_INTELIX_1_DB}
@@ -43,7 +43,8 @@ services:
     volumes:
       - dashboard_data:/usr/share/nginx/html/data:ro
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost/healthz || exit 1"]
+      # 127.0.0.1 y no localhost: en nginx:alpine localhost resuelve a ::1 y nginx solo escucha IPv4.
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/healthz || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -52,15 +53,15 @@ services:
       - dc_red
 
   # Expone dashboard-web a internet sin abrir ningún puerto entrante en el
-  # router/firewall de oficina — solo conexión saliente de este contenedor
-  # hacia el borde de Cloudflare (que termina el HTTPS público con su
-  # propio certificado). Ver docs/RUNBOOK.md para crear el túnel y obtener
-  # CLOUDFLARE_TUNNEL_TOKEN desde el dashboard Zero Trust de Cloudflare.
+  # router/firewall de oficina — solo conexión saliente hacia Cloudflare, que
+  # termina el HTTPS público. "Quick Tunnel": sin cuenta ni dominio; la URL
+  # pública (https://<aleatorio>.trycloudflare.com) aparece en los logs de
+  # este contenedor y CAMBIA cada vez que se reinicia. Ver docs/RUNBOOK.md.
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: dc_cloudflared
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate --url http://dashboard-web:80
     depends_on:
       - dashboard-web
     networks:

@@ -22,8 +22,11 @@ docker compose down -v    # además destruye el volumen (se pierde el snapshot) 
 
 ## Verificar conectividad a SQL Server
 
-`10.80.11.70\DEV` es una instancia nombrada (sin puerto fijo, se resuelve por SQL Browser) —
-distinta del patrón host+puerto fijo que usa el resto del proyecto. Desde el host (requiere
+La instancia es `WS-BDD-INTELIX\DEV`, pero se conecta por **IP+puerto** (`10.80.11.70,1433`,
+puerto confirmado vía SQL Browser), igual que el resto del proyecto. **No usar
+`10.80.11.70\DEV` en las variables de Coolify**: Coolify guarda la barra invertida duplicada
+(`\\DEV`), el driver busca una instancia inexistente y falla con `Login timeout expired` — parece
+un problema de red/firewall y no lo es (costó una tarde de diagnóstico). Desde el host (requiere
 `sqlcmd`/`msodbcsql17`/`18`, ya instalados en la distro WSL "dashboards"):
 
 ```bash
@@ -132,10 +135,11 @@ distro y clonar el repo.
   contradice la decisión explícita de no exponer este equipo a internet (ver `CLAUDE.md`, sección
   "Próximos pasos"). Dejar esos campos vacíos.
 - **Antes de dar por cerrado el despliegue**, validar que el servidor de Coolify tiene ruta de
-  red hacia `$MSSQL_INTELIX_1_HOST` (instancia nombrada, sin puerto fijo — puede necesitar que
-  SQL Browser/UDP 1434 también sea alcanzable, a diferencia de los otros orígenes de este
-  proyecto que usan IP+puerto fijo) — es un supuesto externo, coordinado en paralelo con el
-  equipo de infraestructura (ver `docs/ARQUITECTURA.md`).
+  red hacia `$MSSQL_INTELIX_1_HOST` (`10.80.11.70,1433`) — es un supuesto externo, coordinado en
+  paralelo con el equipo de infraestructura (ver `docs/ARQUITECTURA.md`).
+- **El auto-deploy por push no se dispara solo** en esta instancia (el repo está conectado por
+  deploy key, sin webhook de GitHub). Tras cada push, desplegar desde la UI de Coolify
+  ("Redeploy") o vía API: `POST /api/v1/deploy?uuid=ifgcpozbzayknigv2xjwxt8r`.
 - Confirmar que el volumen nombrado `dc_dashboard_data` no se destruye en cada redeploy (ahí vive
   el `datos.js` vigente).
 - **Alcance de red actual:** igual que Grafana hoy, el puerto publicado (`8081`) solo es
@@ -173,9 +177,6 @@ de Windows** (Task Scheduler) con disparador "Al iniciar sesión", ejecutándose
 Administrador, para que se re-ejecute automáticamente y actualice la regla con la IP nueva de
 WSL2 cada vez que el equipo arranca.
 
-Actualizar `CLAUDE.md` (sección "Próximos pasos") para reflejar este cambio de plan la próxima
-vez que se edite — sigue mencionando `mirrored` como si fuera viable.
-
 ### Acceso público a internet — Cloudflare Tunnel (decisión revertida sobre no exponer el equipo)
 
 `CLAUDE.md` documentaba explícitamente posponer el acceso desde internet — este mismo equipo
@@ -190,28 +191,33 @@ eso el Traefik/Let's Encrypt automático de Coolify **no se usa aquí** (su chal
 necesita que el puerto 80 sea alcanzable desde internet, justo lo que el túnel evita); el
 `docker_compose_domains` del recurso Coolify se deja vacío a propósito, igual que antes.
 
-**Qué falta hacer en el dashboard de Cloudflare (requiere su cuenta/login, no se puede automatizar
-desde aquí):**
+**MVP actual: "Quick Tunnel" (sin cuenta ni dominio).** `cloudflared` corre con
+`tunnel --url http://dashboard-web:80` y Cloudflare le asigna una URL pública aleatoria
+`https://<palabras>.trycloudflare.com`, con HTTPS. Para obtenerla:
 
-1. Cuenta de Cloudflare con un dominio agregado (Zero Trust está disponible en el plan gratis).
-2. **Zero Trust → Networks → Tunnels → Create a tunnel** → conector "Cloudflared" → nombrarlo
-   (p. ej. `dashboard-concentra`) → copiar el **token** que se muestra (una cadena larga) —
-   pegarlo en `.env` como `CLOUDFLARE_TUNNEL_TOKEN`, **no en el chat ni en la terminal
-   compartida**.
-3. En la pestaña **Public Hostname** del túnel: agregar un hostname (p. ej.
-   `licencias.tudominio.com`), tipo de servicio **HTTP**, URL `dashboard-web:80` — el nombre del
-   servicio interno de `docker-compose`, resoluble porque `cloudflared` está en la misma red
-   `dc_red` (no hace falta IP ni puerto publicado del host).
-4. `docker compose up -d cloudflared` (o `up -d` completo). Verificar en el dashboard de
-   Cloudflare que el túnel aparece "Healthy"/conectado, y probar el hostname público desde
-   cualquier red externa.
+```bash
+docker logs $(docker ps -q -f name=cloudflared) 2>&1 | grep -o 'https://[a-z0-9-]*\.trycloudflare\.com'
+```
+
+Limitaciones aceptadas para el MVP:
+- **La URL cambia cada vez que el contenedor `cloudflared` se reinicia** (redeploy, reinicio de
+  WSL/Windows). Hay que volver a sacarla de los logs y re-compartirla.
+- Cloudflare los ofrece "para pruebas", sin garantía de disponibilidad.
+
+**Siguiente paso para fortalecer (cuando haga falta una URL fija):** un túnel "nombrado" en
+Cloudflare Zero Trust, que sí requiere un dominio en la cuenta de Cloudflare (se compra en el
+propio Cloudflare, ~10 USD/año, o se usa un subdominio de uno que la empresa ya tenga). Con eso
+el comando pasa a `tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}` y el hostname público se
+apunta a `dashboard-web:80` desde el dashboard de Cloudflare. Alternativa: esperar al servidor
+remoto dedicado.
 
 **Mitigaciones aplicadas por la exposición a internet** (más allá de lo que ya bastaba para la
 red de oficina):
 - Contraseña de auth básica regenerada, más larga (ver `NGINX_BASIC_AUTH_PASS` en Coolify).
 - `limit_req` en `web/nginx.conf`: limita a ~5 requests/min por IP tras un burst inicial de 10 —
   no afecta el uso normal (cargar la página + `datos.js`), sí frena scripts de fuerza bruta contra
-  la auth básica.
+  la auth básica. La IP real del visitante se toma de `CF-Connecting-IP` (si no, todo el tráfico
+  del túnel compartiría un solo cupo).
 - La pestaña "Data bruta" del Excel (expone `id_HR` de empleado sin filtrar) se deja **igual**
   por decisión explícita del usuario, pese a la audiencia ahora potencialmente de internet.
 

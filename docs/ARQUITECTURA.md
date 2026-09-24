@@ -8,7 +8,7 @@
 ## Flujo de datos
 
 ```
-SQL Server Intelix 1 (10.80.11.70\DEV, gc_wfm.dbo.tbl_dashboard_users_intelix)
+SQL Server Intelix 1 (10.80.11.70,1433 — instancia WS-BDD-INTELIX\DEV, gc_wfm.dbo.tbl_dashboard_users_intelix)
         │  SELECT de solo lectura (MSSQL_INTELIX_1_*), una vez al día (cron)
         ▼
 dashboard-etl (Python + pyodbc) → limpia/canonicaliza texto, arma catálogo de
@@ -134,7 +134,7 @@ implementen.
 Esta rama solo usa el origen **SQL Server Intelix (DEV)** — no toca el datasource "Concentra"
 (principal) ni sus variables `MSSQL_HOST`/`MSSQL_USER_GRAFANA`, que son exclusivas de `main`.
 
-- **`MSSQL_INTELIX_1_*`**: credencial contra `10.80.11.70\DEV` / `gc_wfm`, consumida directamente
+- **`MSSQL_INTELIX_1_*`**: credencial contra `10.80.11.70,1433` (instancia `DEV`) / `gc_wfm`, consumida directamente
   por `dashboard-etl` (pyodbc). Servidor y base distintos de los que usa `main` para Grafana — ver
   "Origen: dashboard portado de un proyecto existente" arriba.
 - **`NGINX_BASIC_AUTH_USER`/`NGINX_BASIC_AUTH_PASS`**: credencial compartida (no individual) para

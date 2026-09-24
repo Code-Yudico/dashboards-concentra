@@ -1,4 +1,4 @@
-"""Vuelca gc_wfm.dbo.tbl_dashboard_users_intelix (servidor 10.80.11.70\\DEV) a datos.js
+"""Vuelca gc_wfm.dbo.tbl_dashboard_users_intelix (servidor 10.80.11.70,1433, instancia DEV) a datos.js
 para el dashboard de web/index.html.
 
 Logica de conteo y formato de salida portados del dashboard original

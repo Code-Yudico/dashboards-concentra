@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Licencias Intelix</title>
+<link rel="stylesheet" href="style.css" />
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2/plotly.min.js"></script>
+</head>
+<body>
+<header>
+  <h1>Licencias de usuario &mdash; Intelix</h1>
+  <p class="subtitulo">Suma de <code>num_usuarios</code> a lo largo del tiempo, por criterio seleccionado.</p>
+</header>
+
+<main>
+  <section class="controles">
+    <label>
+      Agrupar por
+      <select id="agrupar_por">
+        <option value="ceco">Centro de costo</option>
+        <option value="DeptoBiometrico">Depto biométrico</option>
+        <option value="alias">Alias</option>
+        <option value="SITE" selected>Site</option>
+        <option value="locacion">Locación</option>
+      </select>
+    </label>
+
+    <label>
+      Granularidad
+      <select id="granularidad">
+        <option value="dia">Día</option>
+        <option value="semana">Semana</option>
+        <option value="mes" selected>Mes</option>
+      </select>
+    </label>
+
+    <label>
+      Tipo de gráfico
+      <select id="tipo_grafico">
+        <option value="barras_apiladas" selected>Barras apiladas</option>
+        <option value="lineas">Líneas múltiples</option>
+        <option value="area_apilada">Área apilada</option>
+        <option value="barras_100">Barras 100% (proporción)</option>
+      </select>
+    </label>
+  </section>
+
+  <section id="estado" class="estado" hidden></section>
+
+  <section class="grafico">
+    <div id="plot"></div>
+  </section>
+
+  <footer id="pie" class="pie"></footer>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

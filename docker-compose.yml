@@ -1,53 +1,56 @@
 services:
-  grafana:
-    image: grafana/grafana-oss:11.6.0
-    container_name: dc_grafana
+  # Rama alterna sin Grafana: un contenedor extrae la vista una vez al día
+  # (dashboard-etl) y otro sirve el HTML estático que la renderiza
+  # (dashboard-web). Ver docs/ARQUITECTURA.md para la comparación con la
+  # rama Grafana (main).
+  dashboard-etl:
+    build:
+      context: ./etl-diario
+    container_name: dc_dashboard_etl
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     environment:
       TZ: ${TZ}
-      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
-      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
-      GF_USERS_ALLOW_SIGN_UP: ${GF_USERS_ALLOW_SIGN_UP}
-      GF_SERVER_ROOT_URL: ${GF_SERVER_ROOT_URL}
-      GF_LOG_LEVEL: info
-      GF_ANALYTICS_REPORTING_ENABLED: "false"
-      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
-      # Consumidas por grafana/provisioning/datasources/mssql.yaml para
-      # interpolar la conexión directa a SQL Server (ver docs/ARQUITECTURA.md).
-      MSSQL_HOST: ${MSSQL_HOST}
-      MSSQL_PORT: ${MSSQL_PORT}
-      MSSQL_DB: ${MSSQL_DB}
-      MSSQL_USER_GRAFANA: ${MSSQL_USER_GRAFANA}
-      MSSQL_PASS_GRAFANA: ${MSSQL_PASS_GRAFANA}
-      MSSQL_ENCRYPT: ${MSSQL_ENCRYPT}
-      MSSQL_TRUST_CERT: ${MSSQL_TRUST_CERT}
-      # Consumidas por grafana/provisioning/datasources/mssql-intelix.yaml
-      # (segundo origen SQL Server, servidor DEV, vista vw_dashboard_usuarios_intelix).
+      SNAPSHOT_CRON_SCHEDULE: ${SNAPSHOT_CRON_SCHEDULE}
+      SNAPSHOT_OUTPUT_PATH: ${SNAPSHOT_OUTPUT_PATH}
+      # Mismo origen y patrón de credenciales que ya usa la rama Grafana
+      # para este datasource (grafana/provisioning/datasources/mssql-intelix.yaml).
       MSSQL_INTELIX_HOST: ${MSSQL_INTELIX_HOST}
       MSSQL_INTELIX_PORT: ${MSSQL_INTELIX_PORT}
       MSSQL_INTELIX_DB: ${MSSQL_INTELIX_DB}
       MSSQL_INTELIX_USER: ${MSSQL_INTELIX_USER}
       MSSQL_INTELIX_PASS: ${MSSQL_INTELIX_PASS}
-      MSSQL_INTELIX_ENCRYPT: ${MSSQL_INTELIX_ENCRYPT}
-      MSSQL_INTELIX_TRUST_CERT: ${MSSQL_INTELIX_TRUST_CERT}
     volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - dashboard_data:/data
+    networks:
+      - dc_red
+
+  dashboard-web:
+    build:
+      context: ./web
+    container_name: dc_dashboard_web
+    restart: unless-stopped
+    depends_on:
+      - dashboard-etl
+    ports:
+      - "8081:80"
+    environment:
+      TZ: ${TZ}
+      NGINX_BASIC_AUTH_USER: ${NGINX_BASIC_AUTH_USER}
+      NGINX_BASIC_AUTH_PASS: ${NGINX_BASIC_AUTH_PASS}
+    volumes:
+      - dashboard_data:/usr/share/nginx/html/data:ro
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost/healthz || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 10s
     networks:
       - dc_red
 
 volumes:
-  grafana_data:
-    name: dc_grafana_data
+  dashboard_data:
+    name: dc_dashboard_data
 
 networks:
   dc_red:

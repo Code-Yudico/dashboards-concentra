@@ -183,6 +183,14 @@ conscientemente mientras dure:
   sin reenvío de puertos en Windows. El modo "mirrored" de WSL2 **no es viable en este equipo**
   (requiere Windows 11, este es Windows 10 y no se va a actualizar) — la vía real es
   `netsh interface portproxy` + regla de Firewall, ver `docs/RUNBOOK.md`.
+- **Acceso desde internet — decisión revertida para este dashboard.** `CLAUDE.md` posponía
+  explícitamente exponer este equipo a internet, precisamente por los riesgos de esta sección
+  (llaves SSH, credenciales de git, acceso a SQL Server de producción, todo en la misma máquina).
+  El usuario autorizó habilitarlo específicamente para este dashboard, con Cloudflare Tunnel (sin
+  abrir puertos entrantes en el router — ver `docs/RUNBOOK.md`) en vez de port-forward directo,
+  para no reintroducir el riesgo original de exponer la IP pública del equipo. Sigue siendo un
+  riesgo mayor que antes (ahora hay una vía de entrada pública, aunque acotada); revisar si en
+  algún momento se prefiere esperar al servidor remoto dedicado en vez de mantenerla aquí.
 
 **Plan de migración:** en cuanto se asigne un servidor Linux remoto dedicado, reinstalar Coolify
 ahí, reconectar este mismo repositorio de GitHub, y reconfigurar las variables de entorno de

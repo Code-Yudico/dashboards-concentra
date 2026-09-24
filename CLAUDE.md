@@ -137,9 +137,11 @@ confundir:
 - WSL2, distro "dashboards" (Ubuntu 24.04) en `D:\wsl\distros`, usuario Linux `pepe`, systemd
   activo. Repositorio en `~/proyectos/dashboards-concentra` (dentro de Linux, NO en `/mnt/c`).
 - Red WSL2 actualmente en modo NAT clásico (no "mirrored") — por eso Grafana solo es alcanzable
-  como `localhost:3000` desde la propia PC, no desde otras computadoras de la red. Hay un plan en
-  curso para cambiar a `networkingMode=mirrored` en `.wslconfig` y exponerlo en la red de oficina
-  (ver "Próximos pasos").
+  como `localhost:3000` desde la propia PC, no desde otras computadoras de la red.
+  **`networkingMode=mirrored` no es viable en este equipo** (requiere Windows 11 build 22621+;
+  este equipo es Windows 10 Pro y no se va a actualizar). La vía real para exponerlo en la red de
+  oficina es `netsh interface portproxy` + regla de Firewall (script
+  `windows/wsl-portproxy.ps1`, rama `feature/dashboard-html-standalone`), ver "Próximos pasos".
 - Docker sin sudo, Compose v2+. `sqlcmd`/`msodbcsql18` instalados en el host WSL para pruebas de
   conectividad manuales (no se usan dentro de ningún contenedor — Grafana no depende de ellos).
 - Repo: `github.com:Code-Yudico/dashboards-concentra` (privado), SSH, rama `main`.
@@ -188,10 +190,13 @@ db/init/, etl/                   existen localmente pero vacías y sin trackear 
 - [ ] **Crear cuentas Viewer** en Grafana (Administration → Users and access → Users) para cada
   directivo — self-registration está desactivado (`GF_USERS_ALLOW_SIGN_UP=false`), así que se
   crean manualmente una por una.
-- [ ] Acceso desde fuera de la oficina (internet): **decidido posponer** hasta que se asigne el
-  servidor remoto dedicado — no se va a exponer este equipo de desarrollo a internet (riesgo de
-  seguridad: esta PC también tiene llaves SSH, credenciales de git y acceso a SQL Server de
-  producción).
+- [ ] Acceso desde fuera de la oficina (internet) para Grafana/`main`: sigue **pospuesto** hasta
+  que se asigne el servidor remoto dedicado — no se va a exponer este equipo de desarrollo a
+  internet directamente (riesgo de seguridad: esta PC también tiene llaves SSH, credenciales de
+  git y acceso a SQL Server de producción). **Excepción puntual:** en la rama
+  `feature/dashboard-html-standalone` sí se habilitó acceso a internet para ese dashboard
+  específico, vía Cloudflare Tunnel (conexión saliente únicamente, sin abrir puertos en el
+  router) — decisión explícita del usuario para ese caso, ver `docs/RUNBOOK.md` en esa rama.
 - [ ] Despliegue en el servidor remoto definitivo — sigue pendiente de que se asigne esa máquina;
   cuando exista, se reinstala Coolify ahí (recordar activar de nuevo "Preserve Repository During
   Deployment") y se reconecta el mismo repositorio.

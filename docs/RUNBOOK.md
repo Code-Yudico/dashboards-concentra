@@ -176,6 +176,45 @@ WSL2 cada vez que el equipo arranca.
 Actualizar `CLAUDE.md` (sección "Próximos pasos") para reflejar este cambio de plan la próxima
 vez que se edite — sigue mencionando `mirrored` como si fuera viable.
 
+### Acceso público a internet — Cloudflare Tunnel (decisión revertida sobre no exponer el equipo)
+
+`CLAUDE.md` documentaba explícitamente posponer el acceso desde internet — este mismo equipo
+tiene llaves SSH, credenciales de git y acceso a SQL Server de producción, y no se quería exponer
+directamente. El usuario dio luz verde a habilitarlo para este dashboard específico, con la
+condición explícita de **no** hacerlo vía port-forward directo en el router de oficina (eso sí
+expondría la IP pública real del equipo — confirmada `200.188.112.154` — a cualquiera que la
+escanee). En su lugar se usa **Cloudflare Tunnel**: el contenedor `cloudflared` solo abre una
+conexión *saliente* hacia el borde de Cloudflare, sin abrir ningún puerto entrante en el
+router/firewall de oficina. Cloudflare termina el HTTPS público con su propio certificado — por
+eso el Traefik/Let's Encrypt automático de Coolify **no se usa aquí** (su challenge HTTP-01
+necesita que el puerto 80 sea alcanzable desde internet, justo lo que el túnel evita); el
+`docker_compose_domains` del recurso Coolify se deja vacío a propósito, igual que antes.
+
+**Qué falta hacer en el dashboard de Cloudflare (requiere su cuenta/login, no se puede automatizar
+desde aquí):**
+
+1. Cuenta de Cloudflare con un dominio agregado (Zero Trust está disponible en el plan gratis).
+2. **Zero Trust → Networks → Tunnels → Create a tunnel** → conector "Cloudflared" → nombrarlo
+   (p. ej. `dashboard-concentra`) → copiar el **token** que se muestra (una cadena larga) —
+   pegarlo en `.env` como `CLOUDFLARE_TUNNEL_TOKEN`, **no en el chat ni en la terminal
+   compartida**.
+3. En la pestaña **Public Hostname** del túnel: agregar un hostname (p. ej.
+   `licencias.tudominio.com`), tipo de servicio **HTTP**, URL `dashboard-web:80` — el nombre del
+   servicio interno de `docker-compose`, resoluble porque `cloudflared` está en la misma red
+   `dc_red` (no hace falta IP ni puerto publicado del host).
+4. `docker compose up -d cloudflared` (o `up -d` completo). Verificar en el dashboard de
+   Cloudflare que el túnel aparece "Healthy"/conectado, y probar el hostname público desde
+   cualquier red externa.
+
+**Mitigaciones aplicadas por la exposición a internet** (más allá de lo que ya bastaba para la
+red de oficina):
+- Contraseña de auth básica regenerada, más larga (ver `NGINX_BASIC_AUTH_PASS` en Coolify).
+- `limit_req` en `web/nginx.conf`: limita a ~5 requests/min por IP tras un burst inicial de 10 —
+  no afecta el uso normal (cargar la página + `datos.js`), sí frena scripts de fuerza bruta contra
+  la auth básica.
+- La pestaña "Data bruta" del Excel (expone `id_HR` de empleado sin filtrar) se deja **igual**
+  por decisión explícita del usuario, pese a la audiencia ahora potencialmente de internet.
+
 ### Nota: el gotcha de "Preserve Repository During Deployment" de `main` no aplica igual aquí
 
 En `main` (Grafana), Coolify limpiaba el checkout tras clonar y dejaba vacíos los bind mounts de

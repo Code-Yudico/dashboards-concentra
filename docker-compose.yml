@@ -51,6 +51,21 @@ services:
     networks:
       - dc_red
 
+  # Expone dashboard-web a internet sin abrir ningún puerto entrante en el
+  # router/firewall de oficina — solo conexión saliente de este contenedor
+  # hacia el borde de Cloudflare (que termina el HTTPS público con su
+  # propio certificado). Ver docs/RUNBOOK.md para crear el túnel y obtener
+  # CLOUDFLARE_TUNNEL_TOKEN desde el dashboard Zero Trust de Cloudflare.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: dc_cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - dashboard-web
+    networks:
+      - dc_red
+
 volumes:
   dashboard_data:
     name: dc_dashboard_data

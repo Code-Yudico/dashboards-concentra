@@ -106,15 +106,37 @@ distro y clonar el repo.
 
 ## Despliegue en Coolify
 
-- Coolify despliega el mismo `docker-compose.yml` de este repositorio (rama
-  `feature/dashboard-html-standalone`); las variables de entorno de producción se configuran en
-  la UI de Coolify (pestaña **Environment Variables** del recurso), replicando `.env.example` —
-  no olvidar `NGINX_BASIC_AUTH_USER`/`NGINX_BASIC_AUTH_PASS` y `SNAPSHOT_CRON_SCHEDULE`.
+- Recurso Coolify de esta rama: nombre `dashboard-html-standalone`, uuid
+  `ifgcpozbzayknigv2xjwxt8r` (recurso **separado** del de Grafana —
+  `thoughtless-trout-wahxe3pgxybee2yx5wa3ksa9` — así que ambas ramas pueden convivir desplegadas
+  al mismo tiempo en este equipo, en puertos distintos). Build pack `dockercompose`, rama
+  `feature/dashboard-html-standalone`, ruta `/docker-compose.yml`, deploy key SSH compartida con
+  el otro recurso (mismo repo). `is_auto_deploy_enabled` está activo: cualquier push a esta rama
+  redespliega solo.
+- Coolify despliega el mismo `docker-compose.yml` de este repositorio; las variables de entorno de
+  producción se configuran en la UI de Coolify (pestaña **Environment Variables** del recurso),
+  replicando `.env.example` — no olvidar `NGINX_BASIC_AUTH_USER`/`NGINX_BASIC_AUTH_PASS` y
+  `SNAPSHOT_CRON_SCHEDULE`. Ya configuradas en este recurso.
+- **Importante — no asignar dominio a este recurso.** Coolify sugiere por defecto un dominio
+  público `http://<uuid>.<ip-publica-del-server>.sslip.io` para cualquier app nueva (visible en el
+  campo `fqdn` de la API), pero para build pack `dockercompose` ese campo es solo informativo —
+  **no se activa ningún ruteo real hasta que se llena `docker_compose_domains`** (verificado: quedó
+  en `None` tras desplegar). Si en algún momento se edita este recurso desde la UI de Coolify y se
+  le asigna un dominio ahí, eso expondría el dashboard a internet a través del proxy Traefik —
+  contradice la decisión explícita de no exponer este equipo a internet (ver `CLAUDE.md`, sección
+  "Próximos pasos"). Dejar esos campos vacíos.
 - **Antes de dar por cerrado el despliegue**, validar que el servidor de Coolify tiene ruta de
   red hacia SQL Server Intelix (`$MSSQL_INTELIX_HOST:$MSSQL_INTELIX_PORT`) — es un supuesto
   externo, coordinado en paralelo con el equipo de infraestructura (ver `docs/ARQUITECTURA.md`).
 - Confirmar que el volumen nombrado `dc_dashboard_data` no se destruye en cada redeploy (ahí vive
   el `snapshot.json` vigente).
+- **Alcance de red actual:** igual que Grafana hoy, el puerto publicado (`8081`) solo es
+  alcanzable desde este mismo equipo (`localhost:8081`) mientras WSL2 siga en modo NAT clásico.
+  Para que sea alcanzable desde otros nodos de la red de oficina (el objetivo real de esta rama,
+  aclarado con el usuario: no es abrirlo a "toda la compañía" como usuarios, sino a "casi
+  cualquier nodo de red"), aplica el mismo pendiente ya documentado: activar
+  `networkingMode=mirrored` en `.wslconfig` y abrir el puerto en el Firewall de Windows (ver
+  "Próximos pasos" en `CLAUDE.md`). No se ha hecho todavía para ninguna de las dos ramas.
 
 ### Nota: el gotcha de "Preserve Repository During Deployment" de `main` no aplica igual aquí
 
